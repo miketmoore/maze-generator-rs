@@ -1,3 +1,5 @@
+use std::fmt;
+
 fn main() {
     println!("Hello, world!");
     carve_maze();
@@ -5,6 +7,12 @@ fn main() {
 
 trait ToString {
     fn to_string(&self) -> String;
+}
+
+impl ToString for Coord {
+    fn to_string(&self) -> String {
+        return format!("row={} x col={}", self.row, self.col);
+    }
 }
 
 struct Coord { row: u32, col: u32 }
@@ -15,11 +23,6 @@ impl Coord {
     }
 }
 
-impl ToString for Coord {
-    fn to_string(&self) -> String {
-        return format!("row={} x col={}", self.row, self.col);
-    }
-}
 
 trait GridCell {
     fn new(coord: Coord) -> Self;
@@ -65,6 +68,51 @@ impl ToString for Cell {
     }
 }
 
+enum Direction {
+    NORTH, EAST, SOUTH, WEST
+}
+
+impl fmt::Display for Direction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match *self {
+            Direction::NORTH => write!(f, "north"),
+            Direction::EAST => write!(f, "east"),
+            Direction::SOUTH => write!(f, "south"),
+            Direction::WEST => write!(f, "west"),
+       }
+    }
+}
+
+enum WallState {
+    SOLID, CARVED
+}
+
+impl fmt::Display for WallState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            WallState::SOLID => write!(f, "solid"),
+            WallState::CARVED => write!(f, "carved"),
+        }
+     }
+}
+
+struct Wall {
+    direction: Direction,
+    state: WallState
+}
+
+impl Wall {
+    fn new(direction: Direction) -> Wall {
+        return Wall{direction, state: WallState::SOLID};
+    }
+}
+
+impl ToString for Wall {
+    fn to_string(&self) -> std::string::String { 
+        return format!("direction={} state={}", self.direction, self.state);
+     }
+}
+
 fn carve_maze() {
     println!("carve maze");
 
@@ -75,6 +123,9 @@ fn carve_maze() {
     cell.mark_start();
     cell.mark_visited();
     cell.mark_popped();
-    println!("{}", cell.to_string())
+    println!("{}", cell.to_string());
+
+    let wall: Wall = Wall::new(Direction::NORTH);
+    println!("{}", wall.to_string());
 
 }
