@@ -134,16 +134,13 @@ impl WallsContainer for Walls {
         cb(&self.west.direction, &self.west);
         cb(&self.south.direction, &self.south);
     }
-    fn to_array(&mut self) -> [&'static Wall; 4] { 
-        let north: &Wall = &self.north;
-        let array: [&Wall; 4] = [
-            north,
+    fn to_array(&mut self) -> [&Wall; 4] { 
+        return [
+            &self.north,
             &self.east,
             &self.west,
             &self.south
         ];
-
-        return array;
     }
 }
 
