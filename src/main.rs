@@ -97,7 +97,7 @@ impl fmt::Display for WallState {
 }
 
 struct Wall {
-    direction: Direction,
+    pub direction: Direction,
     state: WallState
 }
 
@@ -111,6 +111,28 @@ impl ToString for Wall {
     fn to_string(&self) -> std::string::String { 
         return format!("direction={} state={}", self.direction, self.state);
      }
+}
+
+// fn for_each () -> ();
+
+trait WallsContainer {
+    fn for_each(&self, cb: fn(direction: &Direction, wall: &Wall) -> ());
+}
+
+struct Walls {
+    north: Wall,
+    east: Wall,
+    south: Wall,
+    west: Wall,
+}
+
+impl WallsContainer for Walls {
+    fn for_each(&self, cb: fn(direction: &Direction, wall: &Wall) -> ()) {
+        cb(&self.north.direction, &self.north);
+        cb(&self.east.direction, &self.east);
+        cb(&self.west.direction, &self.west);
+        cb(&self.south.direction, &self.south);
+    }
 }
 
 fn carve_maze() {
@@ -128,4 +150,14 @@ fn carve_maze() {
     let wall: Wall = Wall::new(Direction::NORTH);
     println!("{}", wall.to_string());
 
+    let walls: Walls = Walls{
+        north: Wall::new(Direction::NORTH),
+        east: Wall::new(Direction::EAST),
+        south: Wall::new(Direction::SOUTH),
+        west: Wall::new(Direction::WEST),
+    };
+
+    walls.for_each(|direction, wall| {
+        println!("wall for_each: direction={} wall={}", direction, wall.to_string());
+    })
 }
