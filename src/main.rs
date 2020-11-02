@@ -15,14 +15,16 @@ impl ToString for Coord {
     }
 }
 
-struct Coord { row: u32, col: u32 }
+struct Coord {
+    row: u32,
+    col: u32,
+}
 
 impl Coord {
     fn new() -> Coord {
         Coord { row: 2, col: 3 }
     }
 }
-
 
 trait GridCell {
     fn new(coord: Coord) -> Self;
@@ -34,13 +36,23 @@ trait GridCell {
     fn is_popped(&self) -> bool;
 }
 
-struct Cell { coord: Coord, start: bool, visited: bool, popped: bool }
+struct Cell {
+    coord: Coord,
+    start: bool,
+    visited: bool,
+    popped: bool,
+}
 
-impl Cell { }
+impl Cell {}
 
 impl GridCell for Cell {
     fn new(coord: Coord) -> Cell {
-        Cell {coord, start: false, visited: false, popped: false }
+        Cell {
+            coord,
+            start: false,
+            visited: false,
+            popped: false,
+        }
     }
     fn mark_start(&mut self) {
         self.start = true;
@@ -60,31 +72,41 @@ impl GridCell for Cell {
     fn is_popped(&self) -> bool {
         return self.popped == true;
     }
-} 
+}
 
 impl ToString for Cell {
     fn to_string(&self) -> String {
-        return format!("cell coord={} start={} visited={} popped={}", self.coord.to_string(), self.is_start(), self.is_visited(), self.is_popped());
+        return format!(
+            "cell coord={} start={} visited={} popped={}",
+            self.coord.to_string(),
+            self.is_start(),
+            self.is_visited(),
+            self.is_popped()
+        );
     }
 }
 
 enum Direction {
-    NORTH, EAST, SOUTH, WEST
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
 }
 
 impl fmt::Display for Direction {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       match *self {
+        match *self {
             Direction::NORTH => write!(f, "north"),
             Direction::EAST => write!(f, "east"),
             Direction::SOUTH => write!(f, "south"),
             Direction::WEST => write!(f, "west"),
-       }
+        }
     }
 }
 
 enum WallState {
-    SOLID, CARVED
+    SOLID,
+    CARVED,
 }
 
 impl fmt::Display for WallState {
@@ -93,24 +115,27 @@ impl fmt::Display for WallState {
             WallState::SOLID => write!(f, "solid"),
             WallState::CARVED => write!(f, "carved"),
         }
-     }
+    }
 }
 
 struct Wall {
     pub direction: Direction,
-    state: WallState
+    state: WallState,
 }
 
 impl Wall {
     fn new(direction: Direction) -> Wall {
-        return Wall{direction, state: WallState::SOLID};
+        return Wall {
+            direction,
+            state: WallState::SOLID,
+        };
     }
 }
 
 impl ToString for Wall {
-    fn to_string(&self) -> std::string::String { 
+    fn to_string(&self) -> std::string::String {
         return format!("direction={} state={}", self.direction, self.state);
-     }
+    }
 }
 
 // fn for_each () -> ();
@@ -134,13 +159,8 @@ impl WallsContainer for Walls {
         cb(&self.west.direction, &self.west);
         cb(&self.south.direction, &self.south);
     }
-    fn to_array(&mut self) -> [&Wall; 4] { 
-        return [
-            &self.north,
-            &self.east,
-            &self.west,
-            &self.south
-        ];
+    fn to_array(&mut self) -> [&Wall; 4] {
+        return [&self.north, &self.east, &self.west, &self.south];
     }
 }
 
@@ -159,7 +179,7 @@ fn carve_maze() {
     let wall: Wall = Wall::new(Direction::NORTH);
     println!("{}", wall.to_string());
 
-    let walls: Walls = Walls{
+    let walls: Walls = Walls {
         north: Wall::new(Direction::NORTH),
         east: Wall::new(Direction::EAST),
         south: Wall::new(Direction::SOUTH),
@@ -167,6 +187,10 @@ fn carve_maze() {
     };
 
     walls.for_each(|direction, wall| {
-        println!("wall for_each: direction={} wall={}", direction, wall.to_string());
+        println!(
+            "wall for_each: direction={} wall={}",
+            direction,
+            wall.to_string()
+        );
     })
 }
