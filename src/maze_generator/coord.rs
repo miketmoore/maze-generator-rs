@@ -16,4 +16,3 @@ impl ToString for Coord {
         return format!("row={} x col={}", self.row, self.col);
     }
 }
-

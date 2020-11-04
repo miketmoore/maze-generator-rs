@@ -51,9 +51,12 @@ pub struct Walls {
 
 impl WallsContainer for Walls {
     fn new(north: Wall, east: Wall, south: Wall, west: Wall) -> Self {
-        return Walls{
-            north,east,south,west
-        }
+        return Walls {
+            north,
+            east,
+            south,
+            west,
+        };
     }
     fn for_each(&self, cb: fn(direction: &Direction, wall: &Wall) -> ()) {
         cb(&self.north.direction, &self.north);

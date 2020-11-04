@@ -1,16 +1,16 @@
-mod to_string;
-mod coord;
 mod cell;
+mod coord;
 mod direction;
+mod to_string;
 mod wall;
 
 use crate::maze_generator::to_string::ToString;
-use coord::Coord;
 use cell::Cell;
 use cell::GridCell;
-use wall::WallsContainer;
-use wall::Wall;
+use coord::Coord;
 use direction::Direction;
+use wall::Wall;
+use wall::WallsContainer;
 
 pub fn carve_maze() {
     println!("carve maze");
