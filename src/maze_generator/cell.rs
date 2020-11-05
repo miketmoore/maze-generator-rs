@@ -5,55 +5,40 @@ use crate::maze_generator::wall::Wall;
 use crate::maze_generator::wall::Walls;
 use crate::maze_generator::wall::WallsContainer;
 
-// export interface ICell {
-//     readonly getWalls: () => IWalls
-//     readonly markStart: () => void
-//     readonly isStart: () => boolean
-//     readonly markVisited: () => void
-//     readonly isVisited: () => boolean
-//     readonly getOppositeWall: (wall: number) => number
-//     readonly getCoord: () => ICoord
-//     readonly markPopped: () => void
-//     readonly isPopped: () => boolean
-//     readonly isCarved: () => boolean
-//   }
-
-pub trait GridCell {
-    fn new(coord: Coord) -> Self;
+pub trait GridCell<'a> {
+    fn new(coord: &'a Coord) -> Self;
     fn mark_start(&mut self);
     fn is_start(&self) -> bool;
     fn mark_visited(&mut self);
     fn is_visited(&self) -> bool;
     fn mark_popped(&mut self);
     fn is_popped(&self) -> bool;
-    fn get_walls(&self) -> &Walls;
+    fn get_walls<'b>(&'b self) -> &'b Walls;
     fn get_opposite_wall(wall: u32) -> u32;
-    fn get_coord(&self) -> Coord;
+    fn get_coord(&self) -> &'a Coord;
 }
 
-pub struct Cell {
-    coord: Coord,
+pub struct Cell<'a> {
+    coord: &'a Coord,
     start: bool,
     visited: bool,
     popped: bool,
-    walls: &Walls
+    walls: Walls
 }
 
-impl Cell {}
-
-impl GridCell for Cell {
-    fn new(coord: Coord) -> Cell {
+impl<'a> GridCell<'a> for Cell<'a> {
+    fn new(coord: &'a Coord) -> Self {
         Cell {
             coord,
             start: false,
             visited: false,
             popped: false,
-            walls: &WallsContainer::new(
+            walls: WallsContainer::new(
                 Wall::new(Direction::NORTH),
                 Wall::new(Direction::EAST),
                 Wall::new(Direction::SOUTH),
                 Wall::new(Direction::WEST),
-            ),
+            )
         }
     }
     fn mark_start(&mut self) {
@@ -74,8 +59,8 @@ impl GridCell for Cell {
     fn is_popped(&self) -> bool {
         return self.popped == true;
     }
-    fn get_walls(&self) -> &Walls {
-        return self.walls;
+    fn get_walls<'b>(&'b self) -> &'b Walls {
+        return &self.walls;
     }
     fn get_opposite_wall(wall: u32) -> u32 {
         if wall == 0 {
@@ -87,12 +72,12 @@ impl GridCell for Cell {
         }
         return 1;
     }
-    fn get_coord(&self) -> Coord {
+    fn get_coord(&self) -> &'a Coord {
         return self.coord;
     }
 }
 
-impl to_string::ToString for Cell {
+impl<'a> to_string::ToString for Cell<'a> {
     fn to_string(&self) -> String {
         return format!(
             "cell coord={} start={} visited={} popped={}",

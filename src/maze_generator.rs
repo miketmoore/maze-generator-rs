@@ -18,7 +18,7 @@ pub fn carve_maze() {
     let coord: Coord = Coord::new();
     println!("{}", coord.to_string());
 
-    let mut cell: Cell = GridCell::new(coord);
+    let mut cell: Cell = GridCell::new(&coord);
     cell.mark_start();
     cell.mark_visited();
     cell.mark_popped();
