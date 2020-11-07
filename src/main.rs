@@ -50,12 +50,7 @@ impl Cell {
             visited: false,
             popped: false,
             coord,
-            walls: WallsContainer::new(
-                Wall::new(Direction::NORTH),
-                Wall::new(Direction::EAST),
-                Wall::new(Direction::SOUTH),
-                Wall::new(Direction::WEST),
-            ),
+            walls: WallsContainer::new(),
         }
     }
     fn mark_start(&mut self) {
@@ -151,19 +146,15 @@ impl Wall {
     }
 }
 
-impl ToString for Wall {
-    fn to_string(&self) -> std::string::String {
-        return format!("direction={} state={}", self.direction, self.state);
+impl fmt::Display for Wall {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Wall: direction={} state={}", self.direction, self.state)
     }
 }
 
 pub trait WallsContainer {
-    fn new(north: Wall, east: Wall, south: Wall, west: Wall) -> Self;
-    // fn for_each(&self, cb: fn(direction: &Direction, wall: &Wall) -> ());
-    // fn for_each<F>(&self, cb: &mut F)
-    //     where
-    //         F: FnMut(&Direction, &Wall) -> ();
-    fn for_each(&self, cb: impl FnMut(&Direction, &Wall)) -> ();
+    fn new() -> Self;
+    fn for_each(&self, cb: impl FnMut(&Wall)) -> ();
     fn to_array(&mut self) -> [&Wall; 4];
 }
 
@@ -175,27 +166,20 @@ pub struct Walls {
 }
 
 impl WallsContainer for Walls {
-    fn new(north: Wall, east: Wall, south: Wall, west: Wall) -> Self {
+    fn new() -> Self {
         return Walls {
-            north,
-            east,
-            south,
-            west,
+            north: Wall::new(Direction::NORTH),
+            east: Wall::new(Direction::EAST),
+            south: Wall::new(Direction::SOUTH),
+            west: Wall::new(Direction::WEST),
         };
     }
-    fn for_each(&self, mut cb: impl FnMut(&Direction, &Wall)) -> () {
-        cb(&self.north.direction, &self.north);
-        cb(&self.east.direction, &self.east);
-        cb(&self.west.direction, &self.west);
-        cb(&self.south.direction, &self.south);
+    fn for_each(&self, mut cb: impl FnMut(&Wall)) -> () {
+        cb(&self.north);
+        cb(&self.east);
+        cb(&self.west);
+        cb(&self.south);
     }
-    // fn for_each<F>(&self, cb: &mut F) where
-    // F: FnMut(&Direction, &Wall) -> () {
-    //     cb(&self.north.direction, &self.north);
-    //     cb(&self.east.direction, &self.east);
-    //     cb(&self.west.direction, &self.west);
-    //     cb(&self.south.direction, &self.south);
-    // }
     fn to_array(&mut self) -> [&Wall; 4] {
         return [&self.north, &self.east, &self.west, &self.south];
     }
@@ -226,12 +210,6 @@ impl Grid {
     fn debug(&self) -> () {
         println!("rows={}, cols={}", self.rows, self.cols);
     }
-
-    // fn get_cell(&self, row: u32, col: u32) -> Option<&Cell> {
-    //     let key = format!("{},{}", row, col);
-    //     let found = self.cells.get(&key);
-    //     found
-    // }
 
     fn get_cell(&self, coord: &Coord) -> Option<&Cell> {
         let key = format!("{},{}", coord.row, coord.col);
@@ -274,25 +252,6 @@ impl Grid {
         Coord::new(row, col)
     }
 
-    /*
-    public getAvailableCellWalls = (cell: ICell, cellCoord: ICoord) => {
-        // available cell walls are walls that have not been carved and that are adjacent to a cell
-        // that has not been visited
-
-        const walls = cell.getWalls()
-        const results: Wall[] = []
-        walls.forEach((direction, wall) => {
-        if (wall.state === 'solid') {
-            const adjacentCell = this.grid.getAdjacentCell(direction, cellCoord)
-            if (adjacentCell && !adjacentCell.isVisited()) {
-            results.push(wall)
-            }
-        }
-        })
-
-        return results
-    }
-    */
     fn get_available_cell_walls(&self, cell: &Cell, cellCoord: &Coord) -> Vec<Wall> {
         // available cell walls are walls that have not been carved and that are adjacent to a cell
         // that has not been visited
@@ -300,8 +259,8 @@ impl Grid {
         let walls = cell.get_walls();
         let results: Vec<Wall> = Vec::new();
 
-        walls.for_each(|direction: &Direction, wall: &Wall| -> () {
-            println!("for each iteration direction={}", direction);
+        walls.for_each(|wall: &Wall| -> () {
+            println!("for each iteration wall={}", wall);
             // if wall.state.is_solid() {
             //     let adjacent_cell = self.get_adjacent_cell(*direction, *cellCoord);
             //     if adjacent_cell.is_some() && !adjacent_cell.unwrap().is_visited() {
