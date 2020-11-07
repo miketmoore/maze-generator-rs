@@ -1,11 +1,10 @@
-use std::option::Option;
-use std::string::String;
-use std::vec::Vec;
-// use rand::Rng;
 use crate::maze_generator::Cell;
 use crate::maze_generator::Coord;
 use crate::maze_generator::Direction;
 use crate::maze_generator::GridCell;
+use std::option::Option;
+use std::string::String;
+// use rand::Rng;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 
@@ -14,7 +13,7 @@ trait GridTrait {
     fn get_cell<'b>(&self, coord: Coord) -> Option<&'b Cell>;
     fn get_adjacent_cell<'b>(&self, direction: Direction, coord: Coord) -> Option<&'b Cell>;
     fn get_rand_coord(&self) -> Coord;
-    fn get_rand_cell<'b>() -> &'b Cell;
+    fn get_rand_cell<'b>(&self) -> &'b Cell;
 }
 
 struct Grid {
@@ -81,5 +80,10 @@ impl GridTrait for Grid {
         let row: u32 = rng.gen_range(0, self.rows - 1);
         let col: u32 = rng.gen_range(0, self.cols - 1);
         Coord::new(row, col)
+    }
+
+    fn get_rand_cell<'a>(&self) -> &'a Cell {
+        let coord = self.get_rand_coord();
+        self.get_cell(coord).unwrap()
     }
 }
