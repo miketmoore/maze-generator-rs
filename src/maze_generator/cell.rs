@@ -15,7 +15,7 @@ pub trait GridCell<'a> {
     fn is_popped(&self) -> bool;
     fn get_walls<'b>(&'b self) -> &'b Walls;
     fn get_opposite_wall(wall: u32) -> u32;
-    fn get_coord(&self) -> &'a Coord;
+    // fn get_coord(&self) -> &'a Coord;
 }
 
 pub struct Cell {
@@ -72,9 +72,9 @@ impl<'a> GridCell<'a> for Cell {
         }
         return 1;
     }
-    fn get_coord(&self) -> Coord {
-        return self.coord;
-    }
+    // fn get_coord(&self) -> Coord {
+    //     return self.coord;
+    // }
 }
 
 impl<'a> to_string::ToString for Cell {

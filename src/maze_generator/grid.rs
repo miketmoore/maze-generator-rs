@@ -8,7 +8,7 @@ use std::string::String;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 
-trait GridTrait {
+pub trait GridTrait {
     fn new(rows: u32, cols: u32) -> Self;
     fn get_cell<'b>(&self, coord: Coord) -> Option<&'b Cell>;
     fn get_adjacent_cell<'b>(&self, direction: Direction, coord: Coord) -> Option<&'b Cell>;
@@ -16,13 +16,16 @@ trait GridTrait {
     fn get_rand_cell<'b>(&self) -> &'b Cell;
 }
 
-struct Grid {
+pub struct Grid {
     rows: u32,
     cols: u32,
     cells: HashMap<String, Cell>,
 }
 
 impl Grid {
+    pub fn debug(&self) -> () {
+        println!("rows={} x cols={}", self.rows, self.cols);
+    }
     fn get_adjacent_cell_coords(&self, direction: Direction, coord: Coord) -> Coord {
         match direction {
             Direction::NORTH => Coord::new(coord.row - 1, coord.col),
@@ -48,9 +51,7 @@ impl GridTrait for Grid {
 
         for row in 0..rows {
             for col in 0..cols {
-                // put a cell in a (row,col) coordinate
                 let cell = Cell::new(row, col);
-                let x = String::new();
                 let key = format!("{},{}", row, col);
                 cells.insert(key, cell);
             }
@@ -60,7 +61,7 @@ impl GridTrait for Grid {
     }
 
     fn get_cell<'a>(&self, coord: Coord) -> Option<&'a Cell> {
-        let key = format!("{},{}", self.rows, self.cols);
+        let key = format!("{},{}", coord.row, coord.col);
         let cells = self.cells;
         let cell = cells.get(&key);
         return cell;
