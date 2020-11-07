@@ -1,13 +1,13 @@
 use crate::maze_generator::to_string::ToString;
 
 pub struct Coord {
-    row: u32,
-    col: u32,
+    pub row: u32,
+    pub col: u32,
 }
 
 impl Coord {
-    pub fn new() -> Coord {
-        Coord { row: 2, col: 3 }
+    pub fn new(row: u32, col: u32) -> Coord {
+        Coord { row, col }
     }
 }
 

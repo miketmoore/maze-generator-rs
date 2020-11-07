@@ -6,7 +6,7 @@ use crate::maze_generator::wall::Walls;
 use crate::maze_generator::wall::WallsContainer;
 
 pub trait GridCell<'a> {
-    fn new(coord: &'a Coord) -> Self;
+    fn new(row: u32, col: u32) -> Self;
     fn mark_start(&mut self);
     fn is_start(&self) -> bool;
     fn mark_visited(&mut self);
@@ -18,18 +18,18 @@ pub trait GridCell<'a> {
     fn get_coord(&self) -> &'a Coord;
 }
 
-pub struct Cell<'a> {
-    coord: &'a Coord,
+pub struct Cell {
+    coord: Coord,
     start: bool,
     visited: bool,
     popped: bool,
-    walls: Walls
+    walls: Walls,
 }
 
-impl<'a> GridCell<'a> for Cell<'a> {
-    fn new(coord: &'a Coord) -> Self {
+impl<'a> GridCell<'a> for Cell {
+    fn new(row: u32, col: u32) -> Self {
         Cell {
-            coord,
+            coord: Coord::new(row, col),
             start: false,
             visited: false,
             popped: false,
@@ -38,7 +38,7 @@ impl<'a> GridCell<'a> for Cell<'a> {
                 Wall::new(Direction::EAST),
                 Wall::new(Direction::SOUTH),
                 Wall::new(Direction::WEST),
-            )
+            ),
         }
     }
     fn mark_start(&mut self) {
@@ -72,12 +72,12 @@ impl<'a> GridCell<'a> for Cell<'a> {
         }
         return 1;
     }
-    fn get_coord(&self) -> &'a Coord {
+    fn get_coord(&self) -> Coord {
         return self.coord;
     }
 }
 
-impl<'a> to_string::ToString for Cell<'a> {
+impl<'a> to_string::ToString for Cell {
     fn to_string(&self) -> String {
         return format!(
             "cell coord={} start={} visited={} popped={}",
