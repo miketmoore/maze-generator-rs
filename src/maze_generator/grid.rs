@@ -14,6 +14,11 @@ pub trait GridTrait {
     fn get_adjacent_cell<'b>(&self, direction: Direction, coord: Coord) -> Option<&'b Cell>;
     fn get_rand_coord(&self) -> Coord;
     fn get_rand_cell<'b>(&self) -> &'b Cell;
+    fn debug(&self) -> ();
+    fn get_adjacent_cell_coords(&self, direction: Direction, coord: Coord) -> Coord;
+    fn row_in_bounds(&self, row: u32) -> bool;
+    fn col_in_bounds(&self, col: u32) -> bool;
+    fn coord_in_bounds(&self, coord: Coord) -> bool;
 }
 
 pub struct Grid {
@@ -22,8 +27,50 @@ pub struct Grid {
     cells: HashMap<String, Cell>,
 }
 
-impl Grid {
-    pub fn debug(&self) -> () {
+impl<'a> GridTrait for Grid {
+    fn new(rows: u32, cols: u32) -> Self {
+        let mut cells = HashMap::new();
+
+        for row in 0..rows {
+            for col in 0..cols {
+                let cell = Cell::new(row, col);
+                let key = format!("{},{}", row, col);
+                cells.insert(key, cell);
+            }
+        }
+
+        Grid { rows, cols, cells }
+    }
+
+    fn get_cell<'b>(&self, coord: Coord) -> Option<&'b Cell> {
+        let key = format!("{},{}", coord.row, coord.col);
+        let cells = self.cells;
+        let cell = cells.get(&key);
+        return cell;
+    }
+
+    fn get_adjacent_cell<'b>(&self, direction: Direction, coord: Coord) -> Option<&'b Cell> {
+        let adjacentCoord = self.get_adjacent_cell_coords(direction, coord);
+        if self.coord_in_bounds(adjacentCoord) {
+            self.get_cell(adjacentCoord)
+        } else {
+            None
+        }
+    }
+
+    fn get_rand_coord(&self) -> Coord {
+        let mut rng = thread_rng();
+        let row: u32 = rng.gen_range(0, self.rows - 1);
+        let col: u32 = rng.gen_range(0, self.cols - 1);
+        Coord::new(row, col)
+    }
+
+    fn get_rand_cell<'b>(&self) -> &'b Cell {
+        let coord = self.get_rand_coord();
+        self.get_cell(coord).unwrap()
+    }
+
+    fn debug(&self) -> () {
         println!("rows={} x cols={}", self.rows, self.cols);
     }
     fn get_adjacent_cell_coords(&self, direction: Direction, coord: Coord) -> Coord {
@@ -42,49 +89,5 @@ impl Grid {
     }
     fn coord_in_bounds(&self, coord: Coord) -> bool {
         return self.row_in_bounds(coord.row) && self.col_in_bounds(coord.col);
-    }
-}
-
-impl GridTrait for Grid {
-    fn new(rows: u32, cols: u32) -> Self {
-        let mut cells = HashMap::new();
-
-        for row in 0..rows {
-            for col in 0..cols {
-                let cell = Cell::new(row, col);
-                let key = format!("{},{}", row, col);
-                cells.insert(key, cell);
-            }
-        }
-
-        Grid { rows, cols, cells }
-    }
-
-    fn get_cell<'a>(&self, coord: Coord) -> Option<&'a Cell> {
-        let key = format!("{},{}", coord.row, coord.col);
-        let cells = self.cells;
-        let cell = cells.get(&key);
-        return cell;
-    }
-
-    fn get_adjacent_cell<'a>(&self, direction: Direction, coord: Coord) -> Option<&'a Cell> {
-        let adjacentCoord = self.get_adjacent_cell_coords(direction, coord);
-        if self.coord_in_bounds(adjacentCoord) {
-            self.get_cell(adjacentCoord)
-        } else {
-            None
-        }
-    }
-
-    fn get_rand_coord(&self) -> Coord {
-        let mut rng = thread_rng();
-        let row: u32 = rng.gen_range(0, self.rows - 1);
-        let col: u32 = rng.gen_range(0, self.cols - 1);
-        Coord::new(row, col)
-    }
-
-    fn get_rand_cell<'a>(&self) -> &'a Cell {
-        let coord = self.get_rand_coord();
-        self.get_cell(coord).unwrap()
     }
 }

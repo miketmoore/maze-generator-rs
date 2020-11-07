@@ -13,7 +13,6 @@ use grid::Grid;
 use grid::GridTrait;
 
 pub fn carve_maze() {
-
     println!("building a fresh grid");
 
     let rows = 10;
