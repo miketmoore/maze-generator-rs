@@ -24,11 +24,11 @@ pub fn carve_iterative(grid: &Grid) {
             println!("carve iterative 1");
             if history.len() >= 2 {
                 println!("carve iterative 2");
-                let backtrackedCoord = history.pop();
-                if !backtrackedCoord.is_some() {
+                let backtracked_coord = history.pop();
+                if !backtracked_coord.is_some() {
                     panic!("backtracked coord not found");
                 }
-                let backtrackedCell = grid.cell(backtrackedCoord.unwrap());
+                let backtracked_cell = grid.cell(backtracked_coord.unwrap());
             // backtrackedCell.mark_popped();
             } else {
                 running = false;
