@@ -17,7 +17,7 @@ pub trait Griddy {
     fn cell(&self, coord: &Coord) -> &Cell;
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
     fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<Cell>;
-    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord>;
+    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
@@ -57,7 +57,7 @@ impl Griddy for Grid {
         let col = coord.col();
         self.row_in_bounds(row) && self.col_in_bounds(col)
     }
-    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord> {
+    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord> {
         let row = coord.row();
         let col = coord.col();
         match direction {
@@ -68,28 +68,34 @@ impl Griddy for Grid {
                     // TODO return ref to Coord
                     let key = format!("{},{}", row - 1, col);
                     let cell = self.cells.get(&key);
-                    Some(*cell.unwrap().coord())
+                    Some(cell.unwrap().coord())
                 }
             }
             Direction::EAST => {
                 if col == (self.cols - 1) {
                     None
                 } else {
-                    Some(Coord::new(row, col + 1))
+                    let key = format!("{},{}", row, col + 1);
+                    let cell = self.cells.get(&key);
+                    Some(cell.unwrap().coord())
                 }
             }
             Direction::SOUTH => {
                 if row == (self.rows - 1) {
                     None
                 } else {
-                    Some(Coord::new(row + 1, col))
+                    let key = format!("{},{}", row + 1, col);
+                    let cell = self.cells.get(&key);
+                    Some(cell.unwrap().coord())
                 }
             }
             Direction::WEST => {
                 if col == 0 {
                     None
                 } else {
-                    Some(Coord::new(row, col - 1))
+                    let key = format!("{},{}", row, col - 1);
+                    let cell = self.cells.get(&key);
+                    Some(cell.unwrap().coord())
                 }
             }
         }
