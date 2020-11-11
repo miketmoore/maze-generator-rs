@@ -16,7 +16,7 @@ pub trait Griddy {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> Cell;
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
-    fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell>;
+    fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<Cell>;
     fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
@@ -91,7 +91,7 @@ impl<'a> Griddy for Grid {
             }
         }
     }
-    fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell> {
+    fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<Cell> {
         let adjacent_coords_opt = self.get_adjacent_cell_coord(&direction, &cell.coord());
         if !adjacent_coords_opt.is_some() {
             return None;
@@ -110,7 +110,7 @@ impl<'a> Griddy for Grid {
         let cell_walls = cell.walls();
         cell_walls.for_each(|wall: &Wall| -> () {
             if wall.state().is_solid() {
-                let adjacent_cell: Option<Cell> = self.get_adjacent_cell(wall.direction, *cell);
+                let adjacent_cell: Option<Cell> = self.get_adjacent_cell(&wall.direction, cell);
                 if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
                     results.push(*wall);
                 }
@@ -122,6 +122,7 @@ impl<'a> Griddy for Grid {
 
 #[cfg(test)]
 mod tests {
+    use crate::mazegen::cell::Cell;
     use crate::mazegen::coord::Coord;
     use crate::mazegen::direction::Direction;
     use crate::mazegen::grid::Grid;
@@ -240,5 +241,18 @@ mod tests {
             assert_eq!(coord.row(), 1);
             assert_eq!(coord.col(), 0);
         }
+    }
+
+    #[test]
+    fn get_adjacent_cell() {
+        let grid: Grid = Griddy::new(2, 4);
+
+        let direction = &Direction::NORTH;
+        let coord = &Cell::new(Coord::new(2, 2));
+        let cell_opt = grid.get_adjacent_cell(direction, coord);
+        assert_eq!(cell_opt.is_some(), true);
+        let cell = cell_opt.unwrap();
+        assert_eq!(cell.coord().row(), 1);
+        assert_eq!(cell.coord().col(), 2);
     }
 }
