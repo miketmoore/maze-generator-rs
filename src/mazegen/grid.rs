@@ -89,3 +89,54 @@ impl<'a> Griddy for Grid {
         results
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::mazegen::coord::Coord;
+    use crate::mazegen::grid::Grid;
+    use crate::mazegen::grid::Griddy;
+
+    #[test]
+    fn cell() {
+        /*
+               0   1   2   3
+           0|0,0|0,1|0,2|0,3|
+           1|1,0|1,1|1,2|1,3|
+        */
+        let grid: Grid = Griddy::new(2, 4);
+
+        let mut coord: Coord;
+
+        coord = Coord::new(0, 0);
+        assert_eq!(grid.cell(&coord).coord().row(), 0);
+        assert_eq!(grid.cell(&coord).coord().col(), 0);
+
+        coord = Coord::new(0, 1);
+        assert_eq!(grid.cell(&coord).coord().row(), 0);
+        assert_eq!(grid.cell(&coord).coord().col(), 1);
+
+        coord = Coord::new(0, 2);
+        assert_eq!(grid.cell(&coord).coord().row(), 0);
+        assert_eq!(grid.cell(&coord).coord().col(), 2);
+
+        coord = Coord::new(0, 3);
+        assert_eq!(grid.cell(&coord).coord().row(), 0);
+        assert_eq!(grid.cell(&coord).coord().col(), 3);
+
+        coord = Coord::new(1, 0);
+        assert_eq!(grid.cell(&coord).coord().row(), 1);
+        assert_eq!(grid.cell(&coord).coord().col(), 0);
+
+        coord = Coord::new(1, 1);
+        assert_eq!(grid.cell(&coord).coord().row(), 1);
+        assert_eq!(grid.cell(&coord).coord().col(), 1);
+
+        coord = Coord::new(1, 2);
+        assert_eq!(grid.cell(&coord).coord().row(), 1);
+        assert_eq!(grid.cell(&coord).coord().col(), 2);
+
+        coord = Coord::new(1, 3);
+        assert_eq!(grid.cell(&coord).coord().row(), 1);
+        assert_eq!(grid.cell(&coord).coord().col(), 3);
+    }
+}
