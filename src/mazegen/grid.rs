@@ -132,6 +132,7 @@ impl<'a> Griddy<'a> for Grid {
 
         results
     }
+    // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
     fn get_rand_coord(&self) -> &Coord {
         let mut rng = rand::thread_rng();
         let row = rng.gen_range(0, self.rows);
