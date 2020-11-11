@@ -46,7 +46,7 @@ impl Cell {
     fn popped(&self) -> bool {
         return self.popped == true;
     }
-    fn get_opposite_wall_index(&self, wall: u32) -> u32 {
+    fn get_opposite_wall_index(&self, wall: i32) -> i32 {
         if wall == 0 {
             return 2;
         } else if wall == 1 {

@@ -1,17 +1,17 @@
 #[derive(Copy, Clone)]
 pub struct Coord {
-    row: u32,
-    col: u32,
+    row: i32,
+    col: i32,
 }
 
 impl Coord {
-    pub fn new(row: u32, col: u32) -> Self {
+    pub fn new(row: i32, col: i32) -> Self {
         Coord { row, col }
     }
-    pub fn row(&self) -> u32 {
+    pub fn row(&self) -> i32 {
         self.row
     }
-    pub fn col(&self) -> u32 {
+    pub fn col(&self) -> i32 {
         self.col
     }
 }

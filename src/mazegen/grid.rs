@@ -7,25 +7,25 @@ use std::collections::HashMap;
 use std::option::Option;
 
 pub struct Grid {
-    rows: u32,
-    cols: u32,
+    rows: i32,
+    cols: i32,
     cells: HashMap<String, Cell>,
 }
 
 pub trait Griddy {
-    fn new(rows: u32, cols: u32) -> Self;
+    fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> Cell;
     // getAvailableCellWalls
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
     fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell>;
     fn get_adjacent_cell_coord(&self, direction: Direction, coord: Coord) -> Coord;
-    fn row_in_bounds(&self, row: u32) -> bool;
-    fn col_in_bounds(&self, col: u32) -> bool;
+    fn row_in_bounds(&self, row: i32) -> bool;
+    fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: Coord) -> bool;
 }
 
 impl<'a> Griddy for Grid {
-    fn new(rows: u32, cols: u32) -> Self {
+    fn new(rows: i32, cols: i32) -> Self {
         let mut cells = HashMap::new();
 
         for row in 0..rows {
@@ -47,10 +47,10 @@ impl<'a> Griddy for Grid {
         }
         *opt.unwrap()
     }
-    fn row_in_bounds(&self, row: u32) -> bool {
+    fn row_in_bounds(&self, row: i32) -> bool {
         row >= 0 && row < self.rows
     }
-    fn col_in_bounds(&self, col: u32) -> bool {
+    fn col_in_bounds(&self, col: i32) -> bool {
         col >= 0 && col < self.cols
     }
     fn coord_in_bounds(&self, coord: Coord) -> bool {
@@ -60,10 +60,7 @@ impl<'a> Griddy for Grid {
     }
     fn get_adjacent_cell_coord(&self, direction: Direction, coord: Coord) -> Coord {
         match direction {
-            Direction::NORTH => {
-                // TODO
-                Coord::new(coord.row() - 1, coord.col())
-            }
+            Direction::NORTH => Coord::new(coord.row() - 1, coord.col()),
             Direction::EAST => Coord::new(coord.row(), coord.col() + 1),
             Direction::SOUTH => Coord::new(coord.row() + 1, coord.col()),
             Direction::WEST => Coord::new(coord.row(), coord.col() - 1),
