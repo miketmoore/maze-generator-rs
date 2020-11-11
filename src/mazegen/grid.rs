@@ -23,15 +23,15 @@ pub trait Griddy {
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
 }
 
-impl<'a> Griddy for Grid {
+impl Griddy for Grid {
     fn new(rows: i32, cols: i32) -> Self {
         let mut cells = HashMap::new();
 
         for row in 0..rows {
             for col in 0..cols {
                 let key = format!("{},{}", row, col);
-                let coord = Coord::new(row, col);
-                let cell = Cell::new(coord);
+                // let coord = Coord::new(row, col);
+                let cell = Cell::new(row, col);
                 cells.insert(key, cell);
             }
         }
@@ -65,9 +65,10 @@ impl<'a> Griddy for Grid {
                 if row == 0 {
                     None
                 } else {
+                    // TODO return ref to Coord
                     let key = format!("{},{}", row - 1, col);
                     let cell = self.cells.get(&key);
-                    Some(cell.unwrap().coord())
+                    Some(*cell.unwrap().coord())
                 }
             }
             Direction::EAST => {
@@ -251,7 +252,7 @@ mod tests {
         let grid: Grid = Griddy::new(2, 4);
 
         let direction = &Direction::NORTH;
-        let coord = &Cell::new(Coord::new(2, 2));
+        let coord = &Cell::new(2, 2);
         let cell_opt = grid.get_adjacent_cell(direction, coord);
         assert_eq!(cell_opt.is_some(), true);
         let cell = cell_opt.unwrap();

@@ -12,17 +12,17 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(coord: Coord) -> Self {
+    pub fn new(row: i32, col: i32) -> Self {
         Cell {
             start: false,
             visited: false,
             popped: false,
-            coord,
+            coord: Coord::new(row, col),
             walls: WallsContainer::new(),
         }
     }
-    pub fn coord(&self) -> Coord {
-        self.coord
+    pub fn coord(&self) -> &Coord {
+        &self.coord
     }
     pub fn walls(&self) -> Walls {
         self.walls
@@ -62,21 +62,18 @@ impl Cell {
 mod tests {
 
     use crate::mazegen::cell::Cell;
-    use crate::mazegen::coord::Coord;
     use crate::mazegen::walls::WallsContainer;
 
     #[test]
     fn coord() {
-        let coord = Coord::new(123, 234);
-        let cell = Cell::new(coord);
+        let cell = Cell::new(123, 234);
         assert_eq!(cell.coord().row(), 123);
         assert_eq!(cell.coord().col(), 234);
     }
 
     #[test]
     fn walls() {
-        let coord = Coord::new(123, 234);
-        let cell = Cell::new(coord);
+        let cell = Cell::new(123, 234);
         // TODO how to assert walls?
 
         let got = cell.walls();
@@ -86,8 +83,7 @@ mod tests {
 
     #[test]
     fn start_field() {
-        let coord = Coord::new(123, 234);
-        let mut cell = Cell::new(coord);
+        let mut cell = Cell::new(123, 234);
 
         assert_eq!(cell.start(), false);
         cell.mark_start();
@@ -96,8 +92,7 @@ mod tests {
 
     #[test]
     fn visited_field() {
-        let coord = Coord::new(123, 234);
-        let mut cell = Cell::new(coord);
+        let mut cell = Cell::new(123, 234);
 
         assert_eq!(cell.visited(), false);
         cell.mark_visited();
@@ -106,8 +101,7 @@ mod tests {
 
     #[test]
     fn popped_field() {
-        let coord = Coord::new(123, 234);
-        let mut cell = Cell::new(coord);
+        let mut cell = Cell::new(123, 234);
 
         assert_eq!(cell.popped(), false);
         cell.mark_popped();
@@ -116,8 +110,7 @@ mod tests {
 
     #[test]
     fn get_opposite_wall_index() {
-        let coord = Coord::new(123, 234);
-        let cell = Cell::new(coord);
+        let cell = Cell::new(123, 234);
         assert_eq!(cell.get_opposite_wall_index(0), 2);
         assert_eq!(cell.get_opposite_wall_index(1), 3);
         assert_eq!(cell.get_opposite_wall_index(2), 0);
