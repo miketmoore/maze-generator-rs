@@ -123,4 +123,26 @@ mod tests {
             assert_eq!(cell.coord().col(), test[1]);
         }
     }
+
+    #[test]
+    fn row_in_bounds() {
+        let grid: Grid = Griddy::new(2, 4);
+
+        assert_eq!(grid.row_in_bounds(-1), false);
+        assert_eq!(grid.row_in_bounds(0), true);
+        assert_eq!(grid.row_in_bounds(1), true);
+        assert_eq!(grid.row_in_bounds(2), false);
+    }
+
+    #[test]
+    fn col_in_bounds() {
+        let grid: Grid = Griddy::new(2, 4);
+
+        assert_eq!(grid.col_in_bounds(-1), false);
+        assert_eq!(grid.col_in_bounds(0), true);
+        assert_eq!(grid.col_in_bounds(1), true);
+        assert_eq!(grid.col_in_bounds(2), true);
+        assert_eq!(grid.col_in_bounds(3), true);
+        assert_eq!(grid.col_in_bounds(4), false);
+    }
 }
