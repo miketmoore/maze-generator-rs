@@ -14,7 +14,7 @@ pub struct Grid {
 
 pub trait Griddy {
     fn new(rows: i32, cols: i32) -> Self;
-    fn cell(&self, coord: &Coord) -> Cell;
+    fn cell(&self, coord: &Coord) -> &Cell;
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
     fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<Cell>;
     fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord>;
@@ -38,13 +38,13 @@ impl<'a> Griddy for Grid {
 
         Grid { rows, cols, cells }
     }
-    fn cell(&self, coord: &Coord) -> Cell {
+    fn cell(&self, coord: &Coord) -> &Cell {
         let key = format!("{},{}", coord.row(), coord.col());
         let opt = self.cells.get(&key);
         if !opt.is_some() {
             panic!("cell not found");
         }
-        *opt.unwrap()
+        opt.unwrap()
     }
     fn row_in_bounds(&self, row: i32) -> bool {
         row >= 0 && row < self.rows
@@ -99,7 +99,8 @@ impl<'a> Griddy for Grid {
         let adjacent_coords = adjacent_coords_opt.unwrap();
 
         if self.coord_in_bounds(&adjacent_coords) {
-            Some(self.cell(&adjacent_coords))
+            let adjacent_cell = self.cell(&adjacent_coords);
+            Some(*adjacent_cell)
         } else {
             None
         }
