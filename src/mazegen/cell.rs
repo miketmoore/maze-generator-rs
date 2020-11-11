@@ -24,8 +24,8 @@ impl Cell {
     pub fn coord(&self) -> &Coord {
         &self.coord
     }
-    pub fn walls(&self) -> Walls {
-        self.walls
+    pub fn walls(&self) -> &Walls {
+        &self.walls
     }
     fn mark_start(&mut self) {
         self.start = true;
@@ -62,6 +62,7 @@ impl Cell {
 mod tests {
 
     use crate::mazegen::cell::Cell;
+    use crate::mazegen::direction::Direction;
     use crate::mazegen::walls::WallsContainer;
 
     #[test]
@@ -77,8 +78,7 @@ mod tests {
         // TODO how to assert walls?
 
         let got = cell.walls();
-        let north = got.north();
-        assert_eq!(north.state().is_solid(), true);
+        assert_eq!(got.north().state().is_solid(), true);
     }
 
     #[test]

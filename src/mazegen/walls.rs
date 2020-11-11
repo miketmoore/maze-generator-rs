@@ -43,6 +43,9 @@ impl Wall {
     pub fn state(&self) -> WallState {
         self.state
     }
+    pub fn direction(&self) -> Direction {
+        self.direction
+    }
 }
 
 impl fmt::Display for Wall {
@@ -54,8 +57,8 @@ impl fmt::Display for Wall {
 pub trait WallsContainer {
     fn new() -> Self;
     fn for_each(&self, cb: impl FnMut(&Wall)) -> ();
-    fn to_vec(&self) -> Vec<Wall>;
-    fn north(&self) -> Wall;
+    fn to_vec(&self) -> Vec<&Wall>;
+    fn north(&self) -> &Wall;
 }
 
 #[derive(Copy, Clone)]
@@ -85,16 +88,16 @@ impl WallsContainer for Walls {
         cb(&self.west);
         cb(&self.south);
     }
-    fn to_vec(&self) -> Vec<Wall> {
+    fn to_vec(&self) -> Vec<&Wall> {
         let mut v = Vec::new();
-        v.push(self.north);
-        v.push(self.east);
-        v.push(self.south);
-        v.push(self.west);
+        v.push(&self.north);
+        v.push(&self.east);
+        v.push(&self.south);
+        v.push(&self.west);
         v
     }
-    fn north(&self) -> Wall {
-        self.north
+    fn north(&self) -> &Wall {
+        &self.north
     }
 }
 
