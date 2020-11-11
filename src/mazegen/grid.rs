@@ -12,10 +12,10 @@ pub struct Grid {
     cells: HashMap<String, Cell>,
 }
 
-pub trait Griddy {
+pub trait Griddy<'a> {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> &Cell;
-    fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
+    fn get_available_cell_walls(&self, cell: &'a Cell) -> Vec<&'a Wall>;
     fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<&Cell>;
     fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
@@ -23,7 +23,7 @@ pub trait Griddy {
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
 }
 
-impl Griddy for Grid {
+impl<'a> Griddy<'a> for Grid {
     fn new(rows: i32, cols: i32) -> Self {
         let mut cells = HashMap::new();
 
@@ -114,18 +114,21 @@ impl Griddy for Grid {
             None
         }
     }
-    fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall> {
-        let mut results: Vec<Wall> = Vec::new();
+    fn get_available_cell_walls(&self, cell: &'a Cell) -> Vec<&'a Wall> {
+        let mut results: Vec<&Wall> = Vec::new();
 
         let cell_walls = cell.walls();
-        cell_walls.for_each(|wall: &Wall| -> () {
+        let cell_walls_vec = cell_walls.to_vec();
+
+        for wall in cell_walls_vec {
             if wall.state().is_solid() {
                 let adjacent_cell = self.get_adjacent_cell(&wall.direction, cell);
                 if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
-                    results.push(*wall);
+                    results.push(wall);
                 }
             }
-        });
+        }
+
         results
     }
 }

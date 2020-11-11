@@ -4,7 +4,6 @@ use std::vec::Vec;
 
 pub trait WallsContainer {
     fn new() -> Self;
-    fn for_each(&self, cb: impl FnMut(&Wall)) -> ();
     fn to_vec(&self) -> Vec<&Wall>;
     fn north(&self) -> &Wall;
 }
@@ -30,12 +29,6 @@ impl WallsContainer for Walls {
             west,
         };
     }
-    fn for_each(&self, mut cb: impl FnMut(&Wall)) -> () {
-        cb(&self.north);
-        cb(&self.east);
-        cb(&self.west);
-        cb(&self.south);
-    }
     fn to_vec(&self) -> Vec<&Wall> {
         let mut v = Vec::new();
         v.push(&self.north);
@@ -52,23 +45,9 @@ impl WallsContainer for Walls {
 #[cfg(test)]
 mod tests {
 
-    use crate::mazegen::wall::Wall;
     use crate::mazegen::walls::Walls;
     use crate::mazegen::walls::WallsContainer;
 
-    #[test]
-    fn for_each() {
-        let walls: &Walls = &WallsContainer::new();
-
-        let mut count = 0;
-        let mut directions: String = String::new();
-        walls.for_each(|wall: &Wall| -> () {
-            count = count + 1;
-            directions = format!("{};{}", directions, wall.direction);
-        });
-        assert_eq!(count, 4);
-        assert_eq!(directions, ";north;east;west;south");
-    }
     #[test]
     fn to_vec() {
         let walls: &Walls = &WallsContainer::new();

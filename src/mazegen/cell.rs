@@ -62,7 +62,6 @@ impl Cell {
 mod tests {
 
     use crate::mazegen::cell::Cell;
-    use crate::mazegen::direction::Direction;
     use crate::mazegen::walls::WallsContainer;
 
     #[test]
