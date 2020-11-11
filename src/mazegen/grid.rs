@@ -65,7 +65,9 @@ impl<'a> Griddy for Grid {
                 if row == 0 {
                     None
                 } else {
-                    Some(Coord::new(row - 1, col))
+                    let key = format!("{},{}", row - 1, col);
+                    let cell = self.cells.get(&key);
+                    Some(cell.unwrap().coord())
                 }
             }
             Direction::EAST => {
