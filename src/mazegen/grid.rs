@@ -62,44 +62,37 @@ impl<'a> Griddy<'a> for Grid {
     fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord> {
         let row = coord.row();
         let col = coord.col();
+        let mut new_row = row;
+        let mut new_col = col;
         match direction {
             Direction::NORTH => {
                 if row == 0 {
-                    None
-                } else {
-                    let key = format!("{},{}", row - 1, col);
-                    let cell = self.cells.get(&key);
-                    Some(cell.unwrap().coord())
+                    return None;
                 }
+                new_row = row - 1;
             }
             Direction::EAST => {
                 if col == (self.cols - 1) {
-                    None
-                } else {
-                    let key = format!("{},{}", row, col + 1);
-                    let cell = self.cells.get(&key);
-                    Some(cell.unwrap().coord())
+                    return None;
                 }
+                new_col = col + 1;
             }
             Direction::SOUTH => {
                 if row == (self.rows - 1) {
-                    None
-                } else {
-                    let key = format!("{},{}", row + 1, col);
-                    let cell = self.cells.get(&key);
-                    Some(cell.unwrap().coord())
+                    return None;
                 }
+                new_row = row + 1;
             }
             Direction::WEST => {
                 if col == 0 {
-                    None
-                } else {
-                    let key = format!("{},{}", row, col - 1);
-                    let cell = self.cells.get(&key);
-                    Some(cell.unwrap().coord())
+                    return None;
                 }
+                new_col = col - 1;
             }
         }
+        let key = format!("{},{}", new_row, new_col);
+        let cell = self.cells.get(&key);
+        Some(cell.unwrap().coord())
     }
     fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<&Cell> {
         let adjacent_coords_opt = self.get_adjacent_cell_coord(&direction, &cell.coord());
