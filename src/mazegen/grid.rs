@@ -105,38 +105,22 @@ mod tests {
         */
         let grid: Grid = Griddy::new(2, 4);
 
-        let mut coord: Coord;
+        let tests: [[i32; 2]; 8] = [
+            [0, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [1, 0],
+            [1, 1],
+            [1, 2],
+            [1, 3],
+        ];
 
-        coord = Coord::new(0, 0);
-        assert_eq!(grid.cell(&coord).coord().row(), 0);
-        assert_eq!(grid.cell(&coord).coord().col(), 0);
-
-        coord = Coord::new(0, 1);
-        assert_eq!(grid.cell(&coord).coord().row(), 0);
-        assert_eq!(grid.cell(&coord).coord().col(), 1);
-
-        coord = Coord::new(0, 2);
-        assert_eq!(grid.cell(&coord).coord().row(), 0);
-        assert_eq!(grid.cell(&coord).coord().col(), 2);
-
-        coord = Coord::new(0, 3);
-        assert_eq!(grid.cell(&coord).coord().row(), 0);
-        assert_eq!(grid.cell(&coord).coord().col(), 3);
-
-        coord = Coord::new(1, 0);
-        assert_eq!(grid.cell(&coord).coord().row(), 1);
-        assert_eq!(grid.cell(&coord).coord().col(), 0);
-
-        coord = Coord::new(1, 1);
-        assert_eq!(grid.cell(&coord).coord().row(), 1);
-        assert_eq!(grid.cell(&coord).coord().col(), 1);
-
-        coord = Coord::new(1, 2);
-        assert_eq!(grid.cell(&coord).coord().row(), 1);
-        assert_eq!(grid.cell(&coord).coord().col(), 2);
-
-        coord = Coord::new(1, 3);
-        assert_eq!(grid.cell(&coord).coord().row(), 1);
-        assert_eq!(grid.cell(&coord).coord().col(), 3);
+        for test in tests.iter() {
+            let coord = Coord::new(test[0], test[1]);
+            let cell = grid.cell(&coord);
+            assert_eq!(cell.coord().row(), test[0]);
+            assert_eq!(cell.coord().col(), test[1]);
+        }
     }
 }
