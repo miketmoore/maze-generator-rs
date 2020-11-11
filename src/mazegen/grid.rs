@@ -65,7 +65,6 @@ impl<'a> Griddy<'a> for Grid {
                 if row == 0 {
                     None
                 } else {
-                    // TODO return ref to Coord
                     let key = format!("{},{}", row - 1, col);
                     let cell = self.cells.get(&key);
                     Some(cell.unwrap().coord())
