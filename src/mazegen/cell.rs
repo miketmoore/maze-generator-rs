@@ -34,13 +34,13 @@ impl Cell {
         self.start == true
     }
 
-    fn mark_visited(&mut self) {
+    pub fn mark_visited(&mut self) {
         self.visited = true;
     }
     pub fn visited(&self) -> bool {
         return self.visited == true;
     }
-    fn mark_popped(&mut self) {
+    pub fn mark_popped(&mut self) {
         self.popped = true;
     }
     fn popped(&self) -> bool {

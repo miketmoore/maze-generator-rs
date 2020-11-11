@@ -1,11 +1,13 @@
 use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
+use rand::Rng;
 use std::vec::Vec;
 
 pub trait WallsContainer {
     fn new() -> Self;
     fn to_vec(&self) -> Vec<&Wall>;
     fn north(&self) -> &Wall;
+    fn get_rand(walls: Vec<&Wall>) -> &Wall;
 }
 
 #[derive(Copy, Clone)]
@@ -39,6 +41,11 @@ impl WallsContainer for Walls {
     }
     fn north(&self) -> &Wall {
         &self.north
+    }
+    fn get_rand(walls: Vec<&Wall>) -> &Wall {
+        let mut rng = rand::thread_rng();
+        let i = rng.gen_range(0, 4);
+        walls.get(i).unwrap()
     }
 }
 
