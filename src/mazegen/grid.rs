@@ -17,7 +17,7 @@ pub trait Griddy {
     fn cell(&self, coord: &Coord) -> Cell;
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
     fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell>;
-    fn get_adjacent_cell_coord(&self, direction: Direction, coord: Coord) -> Coord;
+    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
@@ -57,16 +57,47 @@ impl<'a> Griddy for Grid {
         let col = coord.col();
         self.row_in_bounds(row) && self.col_in_bounds(col)
     }
-    fn get_adjacent_cell_coord(&self, direction: Direction, coord: Coord) -> Coord {
+    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<Coord> {
+        let row = coord.row();
+        let col = coord.col();
         match direction {
-            Direction::NORTH => Coord::new(coord.row() - 1, coord.col()),
-            Direction::EAST => Coord::new(coord.row(), coord.col() + 1),
-            Direction::SOUTH => Coord::new(coord.row() + 1, coord.col()),
-            Direction::WEST => Coord::new(coord.row(), coord.col() - 1),
+            Direction::NORTH => {
+                if row == 0 {
+                    None
+                } else {
+                    Some(Coord::new(row - 1, col))
+                }
+            }
+            Direction::EAST => {
+                if col == (self.cols - 1) {
+                    None
+                } else {
+                    Some(Coord::new(row, col + 1))
+                }
+            }
+            Direction::SOUTH => {
+                if row == (self.rows - 1) {
+                    None
+                } else {
+                    Some(Coord::new(row + 1, col))
+                }
+            }
+            Direction::WEST => {
+                if col == 0 {
+                    None
+                } else {
+                    Some(Coord::new(row, col - 1))
+                }
+            }
         }
     }
     fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell> {
-        let adjacent_coords = self.get_adjacent_cell_coord(direction, cell.coord());
+        let adjacent_coords_opt = self.get_adjacent_cell_coord(&direction, &cell.coord());
+        if !adjacent_coords_opt.is_some() {
+            return None;
+        }
+        let adjacent_coords = adjacent_coords_opt.unwrap();
+
         if self.coord_in_bounds(&adjacent_coords) {
             Some(self.cell(&adjacent_coords))
         } else {
@@ -92,6 +123,7 @@ impl<'a> Griddy for Grid {
 #[cfg(test)]
 mod tests {
     use crate::mazegen::coord::Coord;
+    use crate::mazegen::direction::Direction;
     use crate::mazegen::grid::Grid;
     use crate::mazegen::grid::Griddy;
 
@@ -153,5 +185,60 @@ mod tests {
         assert_eq!(grid.coord_in_bounds(&Coord::new(0, 0)), true);
         assert_eq!(grid.coord_in_bounds(&Coord::new(1, 3)), true);
         assert_eq!(grid.coord_in_bounds(&Coord::new(2, 4)), false);
+    }
+
+    #[test]
+    fn get_adjacent_cell_coord() {
+        let grid: Grid = Griddy::new(2, 4);
+
+        let mut coord_opt;
+        let mut coord;
+
+        {
+            let coord_arg = &Coord::new(0, 0);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::NORTH, coord_arg);
+            assert_eq!(coord_opt.is_some(), false);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::EAST, coord_arg);
+            assert_eq!(coord_opt.is_some(), true);
+            coord = coord_opt.unwrap();
+            assert_eq!(coord.row(), 0);
+            assert_eq!(coord.col(), 1);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::SOUTH, coord_arg);
+            assert_eq!(coord_opt.is_some(), true);
+            coord = coord_opt.unwrap();
+            assert_eq!(coord.row(), 1);
+            assert_eq!(coord.col(), 0);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::WEST, coord_arg);
+            assert_eq!(coord_opt.is_some(), false);
+        }
+
+        {
+            let coord_arg = &Coord::new(1, 1);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::NORTH, coord_arg);
+            assert_eq!(coord_opt.is_some(), true);
+            coord = coord_opt.unwrap();
+            assert_eq!(coord.row(), 0);
+            assert_eq!(coord.col(), 1);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::EAST, coord_arg);
+            assert_eq!(coord_opt.is_some(), true);
+            coord = coord_opt.unwrap();
+            assert_eq!(coord.row(), 1);
+            assert_eq!(coord.col(), 2);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::SOUTH, coord_arg);
+            assert_eq!(coord_opt.is_some(), false);
+
+            coord_opt = grid.get_adjacent_cell_coord(&Direction::WEST, coord_arg);
+            assert_eq!(coord_opt.is_some(), true);
+            coord = coord_opt.unwrap();
+            assert_eq!(coord.row(), 1);
+            assert_eq!(coord.col(), 0);
+        }
     }
 }
