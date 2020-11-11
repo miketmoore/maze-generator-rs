@@ -145,4 +145,14 @@ mod tests {
         assert_eq!(grid.col_in_bounds(3), true);
         assert_eq!(grid.col_in_bounds(4), false);
     }
+
+    #[test]
+    fn coord_in_bounds() {
+        let grid: Grid = Griddy::new(2, 4);
+
+        assert_eq!(grid.coord_in_bounds(Coord::new(-1, -1)), false);
+        assert_eq!(grid.coord_in_bounds(Coord::new(0, 0)), true);
+        assert_eq!(grid.coord_in_bounds(Coord::new(1, 3)), true);
+        assert_eq!(grid.coord_in_bounds(Coord::new(2, 4)), false);
+    }
 }
