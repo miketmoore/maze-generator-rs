@@ -15,13 +15,12 @@ pub struct Grid {
 pub trait Griddy {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> Cell;
-    // getAvailableCellWalls
     fn get_available_cell_walls(&self, cell: &Cell) -> Vec<Wall>;
     fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell>;
     fn get_adjacent_cell_coord(&self, direction: Direction, coord: Coord) -> Coord;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
-    fn coord_in_bounds(&self, coord: Coord) -> bool;
+    fn coord_in_bounds(&self, coord: &Coord) -> bool;
 }
 
 impl<'a> Griddy for Grid {
@@ -53,7 +52,7 @@ impl<'a> Griddy for Grid {
     fn col_in_bounds(&self, col: i32) -> bool {
         col >= 0 && col < self.cols
     }
-    fn coord_in_bounds(&self, coord: Coord) -> bool {
+    fn coord_in_bounds(&self, coord: &Coord) -> bool {
         let row = coord.row();
         let col = coord.col();
         self.row_in_bounds(row) && self.col_in_bounds(col)
@@ -68,7 +67,7 @@ impl<'a> Griddy for Grid {
     }
     fn get_adjacent_cell(&self, direction: Direction, cell: Cell) -> Option<Cell> {
         let adjacent_coords = self.get_adjacent_cell_coord(direction, cell.coord());
-        if self.coord_in_bounds(adjacent_coords) {
+        if self.coord_in_bounds(&adjacent_coords) {
             Some(self.cell(&adjacent_coords))
         } else {
             None
@@ -150,9 +149,9 @@ mod tests {
     fn coord_in_bounds() {
         let grid: Grid = Griddy::new(2, 4);
 
-        assert_eq!(grid.coord_in_bounds(Coord::new(-1, -1)), false);
-        assert_eq!(grid.coord_in_bounds(Coord::new(0, 0)), true);
-        assert_eq!(grid.coord_in_bounds(Coord::new(1, 3)), true);
-        assert_eq!(grid.coord_in_bounds(Coord::new(2, 4)), false);
+        assert_eq!(grid.coord_in_bounds(&Coord::new(-1, -1)), false);
+        assert_eq!(grid.coord_in_bounds(&Coord::new(0, 0)), true);
+        assert_eq!(grid.coord_in_bounds(&Coord::new(1, 3)), true);
+        assert_eq!(grid.coord_in_bounds(&Coord::new(2, 4)), false);
     }
 }
