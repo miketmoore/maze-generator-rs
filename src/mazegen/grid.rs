@@ -1,7 +1,7 @@
 use crate::mazegen::cell::Cell;
 use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
-use crate::mazegen::walls::Wall;
+use crate::mazegen::wall::Wall;
 use crate::mazegen::walls::WallsContainer;
 use std::collections::HashMap;
 use std::option::Option;

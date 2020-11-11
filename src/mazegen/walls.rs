@@ -1,58 +1,6 @@
 use crate::mazegen::direction::Direction;
-use std::fmt;
+use crate::mazegen::wall::Wall;
 use std::vec::Vec;
-
-#[derive(Copy, Clone, PartialEq, Eq)]
-pub enum WallState {
-    SOLID,
-    CARVED,
-}
-
-// https://stackoverflow.com/a/48368826/300575
-impl WallState {
-    pub fn is_solid(&self) -> bool {
-        match *self {
-            WallState::SOLID => true,
-            _ => false,
-        }
-    }
-}
-
-impl fmt::Display for WallState {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            WallState::SOLID => write!(f, "solid"),
-            WallState::CARVED => write!(f, "carved"),
-        }
-    }
-}
-
-#[derive(Copy, Clone)]
-pub struct Wall {
-    pub direction: Direction,
-    state: WallState,
-}
-
-impl Wall {
-    pub fn new(direction: Direction) -> Self {
-        return Wall {
-            direction,
-            state: WallState::SOLID,
-        };
-    }
-    pub fn state(&self) -> WallState {
-        self.state
-    }
-    pub fn direction(&self) -> Direction {
-        self.direction
-    }
-}
-
-impl fmt::Display for Wall {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Wall: direction={} state={}", self.direction, self.state)
-    }
-}
 
 pub trait WallsContainer {
     fn new() -> Self;
@@ -104,7 +52,7 @@ impl WallsContainer for Walls {
 #[cfg(test)]
 mod tests {
 
-    use crate::mazegen::walls::Wall;
+    use crate::mazegen::wall::Wall;
     use crate::mazegen::walls::Walls;
     use crate::mazegen::walls::WallsContainer;
 
@@ -128,9 +76,9 @@ mod tests {
         let v = walls.to_vec();
         assert_eq!(v.len(), 4);
 
-        assert_eq!(v[0].state.is_solid(), true);
-        assert_eq!(v[1].state.is_solid(), true);
-        assert_eq!(v[2].state.is_solid(), true);
-        assert_eq!(v[3].state.is_solid(), true);
+        assert_eq!(v[0].state().is_solid(), true);
+        assert_eq!(v[1].state().is_solid(), true);
+        assert_eq!(v[2].state().is_solid(), true);
+        assert_eq!(v[3].state().is_solid(), true);
     }
 }
