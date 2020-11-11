@@ -1,3 +1,4 @@
+pub mod carve_iterative;
 pub mod cell;
 pub mod coord;
 pub mod direction;

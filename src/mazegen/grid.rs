@@ -3,6 +3,7 @@ use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
 use crate::mazegen::walls::WallsContainer;
+use rand::Rng;
 use std::collections::HashMap;
 use std::option::Option;
 
@@ -21,6 +22,7 @@ pub trait Griddy<'a> {
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
+    fn get_rand_coord(&self) -> &Coord;
 }
 
 impl<'a> Griddy<'a> for Grid {
@@ -129,6 +131,13 @@ impl<'a> Griddy<'a> for Grid {
         }
 
         results
+    }
+    fn get_rand_coord(&self) -> &Coord {
+        let mut rng = rand::thread_rng();
+        let row = rng.gen_range(0, self.rows);
+        let col = rng.gen_range(0, self.cols);
+        let key = format!("{},{}", row, col);
+        self.cells.get(&key).unwrap().coord()
     }
 }
 
@@ -266,5 +275,21 @@ mod tests {
         let cell = cell_opt.unwrap();
         assert_eq!(cell.coord().row(), 1);
         assert_eq!(cell.coord().col(), 2);
+    }
+
+    #[test]
+    fn get_rand_coord() {
+        let grid: Grid = Griddy::new(2, 2);
+        let mut count = 0;
+        let max = 100;
+        for _ in 0..max {
+            let coord = grid.get_rand_coord();
+            assert_eq!(coord.row() >= 0, true);
+            assert_eq!(coord.row() <= 1, true);
+            assert_eq!(coord.col() >= 0, true);
+            assert_eq!(coord.col() <= 1, true);
+            count = count + 1;
+        }
+        assert_eq!(count, max);
     }
 }
