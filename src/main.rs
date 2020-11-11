@@ -21,5 +21,8 @@ fn main() {
     // let available = grid.get_available_cell_walls(&a);
     // println!("{}", available.len());
 
-    carve_iterative(2, 2);
+    let rows = 2;
+    let cols = 2;
+    let grid: Grid = Griddy::new(rows, cols);
+    carve_iterative(&grid);
 }

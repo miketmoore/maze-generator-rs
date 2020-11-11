@@ -5,10 +5,8 @@ use crate::mazegen::walls::Walls;
 use crate::mazegen::walls::WallsContainer;
 use std::vec::Vec;
 
-pub fn carve_iterative(rows: i32, cols: i32) {
+pub fn carve_iterative(grid: &Grid) {
     println!("carve iterative start");
-
-    let grid: Grid = Griddy::new(rows, cols);
 
     let coord = grid.get_rand_coord();
     let mut history = Vec::new();
