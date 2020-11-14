@@ -1,16 +1,15 @@
 use crate::mazegen::grid::Grid;
 use crate::mazegen::grid::Griddy;
-use crate::mazegen::wall::Wall;
-use crate::mazegen::walls::Walls;
-use crate::mazegen::walls::WallsContainer;
+use crate::mazegen::coord::Coord;
 use std::vec::Vec;
 
 pub fn carve_iterative(grid: &Grid) {
     println!("carve iterative start");
 
+    let mut history: Vec<&Coord> = Vec::new();
+
     let coord = grid.get_rand_coord();
-    let mut history = Vec::new();
-    history.push(coord);
+    history.push(&coord);
 
     let mut running = true;
     while running {
@@ -18,7 +17,7 @@ pub fn carve_iterative(grid: &Grid) {
         let coord = history[history.len() - 1];
         let cell = grid.cell(&coord);
 
-        let walls = grid.get_available_cell_walls(&cell);
+        let walls = grid.get_available_cell_walls(coord, &cell);
 
         if walls.len() == 0 {
             println!("carve iterative - no walls available");

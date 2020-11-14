@@ -22,13 +22,13 @@ impl Grid {
 pub trait Griddy<'a> {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> &Cell;
-    fn get_available_cell_walls(&self, cell: &'a Cell) -> Vec<&'a Wall>;
-    fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<&Cell>;
-    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord>;
+    fn get_available_cell_walls(&self, coord: &'a Coord, cell: &'a Cell) -> Vec<&'a Wall>;
+    fn get_adjacent_cell(&self, coord: &Coord, direction: &Direction) -> Option<&Cell>;
+    fn get_adjacent_cell_coord(&self, coord: &Coord, direction: &Direction) -> Option<Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
-    fn get_rand_coord(&self) -> &Coord;
+    fn get_rand_coord(&self) -> Coord;
 }
 
 impl<'a> Griddy<'a> for Grid {
@@ -37,8 +37,7 @@ impl<'a> Griddy<'a> for Grid {
 
         for row in 0..rows {
             for col in 0..cols {
-                let cell = Cell::new(row, col);
-                cells.insert(Grid::key(row, col), cell);
+                cells.insert(Grid::key(row, col), Cell::new());
             }
         }
 
@@ -63,7 +62,7 @@ impl<'a> Griddy<'a> for Grid {
         let col = coord.col();
         self.row_in_bounds(row) && self.col_in_bounds(col)
     }
-    fn get_adjacent_cell_coord(&self, direction: &Direction, coord: &Coord) -> Option<&Coord> {
+    fn get_adjacent_cell_coord(&self, coord: &Coord, direction: &Direction) -> Option<Coord> {
         let row = coord.row();
         let col = coord.col();
         let mut new_row = row;
@@ -95,11 +94,18 @@ impl<'a> Griddy<'a> for Grid {
             }
         }
         let key = Grid::key(new_row, new_col);
-        let cell = self.cells.get(&key);
-        Some(cell.unwrap().coord())
+        let cell_opt = self.cells.get(&key);
+        if cell_opt.is_some() {
+            Some(Coord::new(new_row, new_col))
+        } else {
+            None
+        }
     }
-    fn get_adjacent_cell(&self, direction: &Direction, cell: &Cell) -> Option<&Cell> {
-        let adjacent_coords_opt = self.get_adjacent_cell_coord(&direction, &cell.coord());
+    /**
+     * Return the cell that is adjacent to the specified wall.
+     */
+    fn get_adjacent_cell(&self, coord: &Coord, direction: &Direction) -> Option<&Cell> {
+        let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
         if !adjacent_coords_opt.is_some() {
             return None;
         }
@@ -112,7 +118,7 @@ impl<'a> Griddy<'a> for Grid {
             None
         }
     }
-    fn get_available_cell_walls(&self, cell: &'a Cell) -> Vec<&'a Wall> {
+    fn get_available_cell_walls(&self, coord: &'a Coord, cell: &'a Cell) -> Vec<&'a Wall> {
         let mut results: Vec<&Wall> = Vec::new();
 
         let cell_walls = cell.walls();
@@ -120,7 +126,7 @@ impl<'a> Griddy<'a> for Grid {
 
         for wall in cell_walls_vec {
             if wall.state().is_solid() {
-                let adjacent_cell = self.get_adjacent_cell(&wall.direction, cell);
+                let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
                 if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
                     results.push(wall);
                 }
@@ -130,18 +136,18 @@ impl<'a> Griddy<'a> for Grid {
         results
     }
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
-    fn get_rand_coord(&self) -> &Coord {
+    fn get_rand_coord(&self) -> Coord {
         let mut rng = rand::thread_rng();
         let row = rng.gen_range(0, self.rows);
         let col = rng.gen_range(0, self.cols);
-        let key = Grid::key(row, col);
-        self.cells.get(&key).unwrap().coord()
+        // let key = Grid::key(row, col);
+        // self.cells.get(&key).unwrap().coord()
+        Coord::new(row, col)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::mazegen::cell::Cell;
     use crate::mazegen::coord::Coord;
     use crate::mazegen::direction::Direction;
     use crate::mazegen::grid::Grid;
@@ -170,8 +176,9 @@ mod tests {
         for test in tests.iter() {
             let coord = Coord::new(test[0], test[1]);
             let cell = grid.cell(&coord);
-            assert_eq!(cell.coord().row(), test[0]);
-            assert_eq!(cell.coord().col(), test[1]);
+            // TODO
+            // assert_eq!(cell.coord().row(), test[0]);
+            // assert_eq!(cell.coord().col(), test[1]);
         }
     }
 
@@ -217,44 +224,44 @@ mod tests {
         {
             let coord_arg = &Coord::new(0, 0);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::NORTH, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::NORTH);
             assert_eq!(coord_opt.is_some(), false);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::EAST, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::EAST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 0);
             assert_eq!(coord.col(), 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::SOUTH, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::SOUTH);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
             assert_eq!(coord.col(), 0);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::WEST, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::WEST);
             assert_eq!(coord_opt.is_some(), false);
         }
 
         {
             let coord_arg = &Coord::new(1, 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::NORTH, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::NORTH);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 0);
             assert_eq!(coord.col(), 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::EAST, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::EAST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
             assert_eq!(coord.col(), 2);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::SOUTH, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::SOUTH);
             assert_eq!(coord_opt.is_some(), false);
 
-            coord_opt = grid.get_adjacent_cell_coord(&Direction::WEST, coord_arg);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::WEST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
@@ -267,12 +274,12 @@ mod tests {
         let grid: Grid = Griddy::new(2, 4);
 
         let direction = &Direction::NORTH;
-        let coord = &Cell::new(2, 2);
-        let cell_opt = grid.get_adjacent_cell(direction, coord);
+        let cell_opt = grid.get_adjacent_cell(&Coord::new(1, 2), direction);
         assert_eq!(cell_opt.is_some(), true);
         let cell = cell_opt.unwrap();
-        assert_eq!(cell.coord().row(), 1);
-        assert_eq!(cell.coord().col(), 2);
+        // TODO
+        // assert_eq!(cell.coord().row(), 1);
+        // assert_eq!(cell.coord().col(), 2);
     }
 
     #[test]
