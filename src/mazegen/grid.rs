@@ -13,6 +13,12 @@ pub struct Grid {
     cells: HashMap<String, Cell>,
 }
 
+impl Grid {
+    fn key(row: i32, col: i32) -> String {
+        format!("{},{}", row, col)
+    }
+}
+
 pub trait Griddy<'a> {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> &Cell;
@@ -31,17 +37,15 @@ impl<'a> Griddy<'a> for Grid {
 
         for row in 0..rows {
             for col in 0..cols {
-                let key = format!("{},{}", row, col);
-                // let coord = Coord::new(row, col);
                 let cell = Cell::new(row, col);
-                cells.insert(key, cell);
+                cells.insert(Grid::key(row, col), cell);
             }
         }
 
         Grid { rows, cols, cells }
     }
     fn cell(&self, coord: &Coord) -> &Cell {
-        let key = format!("{},{}", coord.row(), coord.col());
+        let key = Grid::key(coord.row(), coord.col());
         let opt = self.cells.get(&key);
         if !opt.is_some() {
             panic!("cell not found");
@@ -90,7 +94,7 @@ impl<'a> Griddy<'a> for Grid {
                 new_col = col - 1;
             }
         }
-        let key = format!("{},{}", new_row, new_col);
+        let key = Grid::key(new_row, new_col);
         let cell = self.cells.get(&key);
         Some(cell.unwrap().coord())
     }
@@ -130,7 +134,7 @@ impl<'a> Griddy<'a> for Grid {
         let mut rng = rand::thread_rng();
         let row = rng.gen_range(0, self.rows);
         let col = rng.gen_range(0, self.cols);
-        let key = format!("{},{}", row, col);
+        let key = Grid::key(row, col);
         self.cells.get(&key).unwrap().coord()
     }
 }
