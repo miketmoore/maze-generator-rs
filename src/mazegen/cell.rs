@@ -1,10 +1,8 @@
-use crate::mazegen::coord::Coord;
 use crate::mazegen::walls::Walls;
 use crate::mazegen::walls::WallsContainer;
 
 #[derive(Copy, Clone)]
 pub struct Cell {
-    coord: Coord,
     start: bool,
     visited: bool,
     popped: bool,
@@ -12,17 +10,13 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(row: i32, col: i32) -> Self {
+    pub fn new() -> Self {
         Cell {
             start: false,
             visited: false,
             popped: false,
-            coord: Coord::new(row, col),
             walls: WallsContainer::new(),
         }
-    }
-    pub fn coord(&self) -> &Coord {
-        &self.coord
     }
     pub fn walls(&self) -> &Walls {
         &self.walls
@@ -65,15 +59,8 @@ mod tests {
     use crate::mazegen::walls::WallsContainer;
 
     #[test]
-    fn coord() {
-        let cell = Cell::new(123, 234);
-        assert_eq!(cell.coord().row(), 123);
-        assert_eq!(cell.coord().col(), 234);
-    }
-
-    #[test]
     fn walls() {
-        let cell = Cell::new(123, 234);
+        let cell = Cell::new();
         // TODO how to assert walls?
 
         let got = cell.walls();
@@ -82,7 +69,7 @@ mod tests {
 
     #[test]
     fn start_field() {
-        let mut cell = Cell::new(123, 234);
+        let mut cell = Cell::new();
 
         assert_eq!(cell.start(), false);
         cell.mark_start();
@@ -91,7 +78,7 @@ mod tests {
 
     #[test]
     fn visited_field() {
-        let mut cell = Cell::new(123, 234);
+        let mut cell = Cell::new();
 
         assert_eq!(cell.visited(), false);
         cell.mark_visited();
@@ -100,7 +87,7 @@ mod tests {
 
     #[test]
     fn popped_field() {
-        let mut cell = Cell::new(123, 234);
+        let mut cell = Cell::new();
 
         assert_eq!(cell.popped(), false);
         cell.mark_popped();
@@ -109,7 +96,7 @@ mod tests {
 
     #[test]
     fn get_opposite_wall_index() {
-        let cell = Cell::new(123, 234);
+        let cell = Cell::new();
         assert_eq!(cell.get_opposite_wall_index(0), 2);
         assert_eq!(cell.get_opposite_wall_index(1), 3);
         assert_eq!(cell.get_opposite_wall_index(2), 0);
