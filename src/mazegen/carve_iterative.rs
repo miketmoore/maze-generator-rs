@@ -14,22 +14,22 @@ pub fn carve_iterative(grid: &Grid) {
 
     let mut running = true;
     while running {
-        println!("carve iterative 0");
+        println!("carve iterative loop start");
         let coord = history[history.len() - 1];
         let cell = grid.cell(&coord);
 
         let walls = grid.get_available_cell_walls(&cell);
 
         if walls.len() == 0 {
-            println!("carve iterative 1");
+            println!("carve iterative - no walls available");
             if history.len() >= 2 {
-                println!("carve iterative 2");
+                println!("carve iterative - backtrack");
                 let backtracked_coord = history.pop();
                 if !backtracked_coord.is_some() {
-                    panic!("backtracked coord not found");
+                    panic!("carve iterative - backtracked coord not found");
                 }
-                let backtracked_cell = grid.cell(backtracked_coord.unwrap());
-                backtracked_cell.mark_popped();
+                // let backtracked_cell = grid.cell(backtracked_coord.unwrap());
+                // backtracked_cell.mark_popped();
                 /*
 cannot borrow `*backtracked_cell` as mutable, as it is behind a `&` reference
 
@@ -37,10 +37,11 @@ cannot borrow `*backtracked_cell` as mutable, as it is behind a `&` reference
 carve_iterative.rs(32, 17): `backtracked_cell` is a `&` reference, so the data it refers to cannot be borrowed as mutable
                 */
             } else {
+                println!("carve iterative - end");
                 running = false;
             }
         } else {
-            println!("carve iterative 3");
+            println!("carve iterative - walls are available - TODO not implemented yet");
             running = false; // TODO temporary
                              // let mut wall = Walls::get_rand(walls);
                              // wall.carve();
