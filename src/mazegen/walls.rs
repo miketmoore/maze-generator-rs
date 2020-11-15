@@ -78,9 +78,9 @@ mod tests {
         let v = walls.to_vec();
         assert_eq!(v.len(), 4);
 
-        assert_eq!(v[0].state().is_solid(), true);
-        assert_eq!(v[1].state().is_solid(), true);
-        assert_eq!(v[2].state().is_solid(), true);
-        assert_eq!(v[3].state().is_solid(), true);
+        assert_eq!(v[0].is_solid(), true);
+        assert_eq!(v[1].is_solid(), true);
+        assert_eq!(v[2].is_solid(), true);
+        assert_eq!(v[3].is_solid(), true);
     }
 }

@@ -120,7 +120,7 @@ impl<'a> Griddy<'a> for Grid {
         }
     }
     fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool {
-        if wall.state().is_solid() {
+        if wall.is_solid() {
             let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
             if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
                 return true;
