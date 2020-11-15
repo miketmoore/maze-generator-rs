@@ -4,14 +4,14 @@ use std::fmt;
 #[derive(Copy, Clone)]
 pub struct Wall {
     pub direction: Direction,
-    solid: bool
+    solid: bool,
 }
 
 impl Wall {
     pub fn new(direction: Direction) -> Self {
         return Wall {
             direction,
-            solid: true
+            solid: true,
         };
     }
     pub fn direction(&self) -> Direction {
@@ -20,7 +20,9 @@ impl Wall {
     pub fn carve(&mut self) -> () {
         self.solid = false;
     }
-    pub fn is_solid(&self) -> bool { self.solid }
+    pub fn is_solid(&self) -> bool {
+        self.solid
+    }
 }
 
 impl fmt::Display for Wall {

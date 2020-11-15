@@ -2,7 +2,6 @@ use crate::mazegen::cell::Cell;
 use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
-use crate::mazegen::walls::Walls;
 use crate::mazegen::walls::WallsContainer;
 use rand::Rng;
 use std::collections::HashMap;
@@ -18,25 +17,7 @@ impl Grid {
     fn key(row: i32, col: i32) -> String {
         format!("{},{}", row, col)
     }
-}
-
-pub trait Griddy {
-    fn new(rows: i32, cols: i32) -> Self;
-    fn cell(&self, coord: &Coord) -> &Cell;
-    fn cell_mut(&mut self, coord: &Coord) -> &mut Cell;
-    fn get_available_cell_walls<'a>(&mut self, coord: &'a Coord, cell: &'a mut Cell, results: &mut Vec<&'a mut Wall>) -> ();
-    fn get_adjacent_cell(&self, coord: &Coord, direction: &Direction) -> Option<&Cell>;
-    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: &Direction) -> Option<&Cell>;
-    fn get_adjacent_cell_coord(&self, coord: &Coord, direction: &Direction) -> Option<Coord>;
-    fn row_in_bounds(&self, row: i32) -> bool;
-    fn col_in_bounds(&self, col: i32) -> bool;
-    fn coord_in_bounds(&self, coord: &Coord) -> bool;
-    fn get_rand_coord(&self) -> Coord;
-    fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool;
-}
-
-impl Griddy for Grid {
-    fn new(rows: i32, cols: i32) -> Self {
+    pub fn new(rows: i32, cols: i32) -> Self {
         let mut cells = HashMap::new();
 
         for row in 0..rows {
@@ -55,13 +36,9 @@ impl Griddy for Grid {
         }
         opt.unwrap()
     }
-    fn cell_mut(&mut self, coord: &Coord) -> &mut Cell {
+    pub fn cell_mut(&mut self, coord: &Coord) -> Option<&mut Cell> {
         let key = Grid::key(coord.row(), coord.col());
-        let opt = self.cells.get_mut(&key);
-        if !opt.is_some() {
-            panic!("cell not found");
-        }
-        opt.unwrap()
+        self.cells.get_mut(&key)
     }
     fn row_in_bounds(&self, row: i32) -> bool {
         row >= 0 && row < self.rows
@@ -156,7 +133,13 @@ impl Griddy for Grid {
         }
         false
     }
-    fn get_available_cell_walls<'a>(&mut self, coord: &'a Coord, cell: &'a mut Cell, results: &mut Vec<&'a mut Wall>) -> () {
+    fn update_available_cell_walls_mut<'a>(
+        &mut self,
+        cell: &'a mut Cell,
+        coord: &Coord,
+        results: &'a mut Vec<&'a mut Wall>,
+    ) -> () {
+        // cannot infer an appropriate lifetime for autoref due to conflicting requirements
         let cell_walls = cell.walls();
 
         if self.is_wall_available(coord, cell_walls.north()) {
@@ -171,13 +154,18 @@ impl Griddy for Grid {
         }
     }
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
-    fn get_rand_coord(&self) -> Coord {
+    pub fn get_rand_coord(&self) -> Coord {
         let mut rng = rand::thread_rng();
         let row = rng.gen_range(0, self.rows);
         let col = rng.gen_range(0, self.cols);
         // let key = Grid::key(row, col);
         // self.cells.get(&key).unwrap().coord()
         Coord::new(row, col)
+    }
+
+    pub fn get_available_cell_walls(&self, cell: &Cell, coord: &Coord) -> [Option<&Wall>; 4] {
+        let walls: [Option<&Wall>; 4] = [None,None,None,None];
+        walls
     }
 }
 
@@ -186,7 +174,6 @@ mod tests {
     use crate::mazegen::coord::Coord;
     use crate::mazegen::direction::Direction;
     use crate::mazegen::grid::Grid;
-    use crate::mazegen::grid::Griddy;
 
     #[test]
     fn cell() {
@@ -195,7 +182,7 @@ mod tests {
            0|0,0|0,1|0,2|0,3|
            1|1,0|1,1|1,2|1,3|
         */
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         let tests: [[i32; 2]; 8] = [
             [0, 0],
@@ -219,7 +206,7 @@ mod tests {
 
     #[test]
     fn row_in_bounds() {
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         assert_eq!(grid.row_in_bounds(-1), false);
         assert_eq!(grid.row_in_bounds(0), true);
@@ -229,7 +216,7 @@ mod tests {
 
     #[test]
     fn col_in_bounds() {
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         assert_eq!(grid.col_in_bounds(-1), false);
         assert_eq!(grid.col_in_bounds(0), true);
@@ -241,7 +228,7 @@ mod tests {
 
     #[test]
     fn coord_in_bounds() {
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         assert_eq!(grid.coord_in_bounds(&Coord::new(-1, -1)), false);
         assert_eq!(grid.coord_in_bounds(&Coord::new(0, 0)), true);
@@ -251,7 +238,7 @@ mod tests {
 
     #[test]
     fn get_adjacent_cell_coord() {
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         let mut coord_opt;
         let mut coord;
@@ -306,7 +293,7 @@ mod tests {
 
     #[test]
     fn get_adjacent_cell() {
-        let grid: Grid = Griddy::new(2, 4);
+        let grid = Grid::new(2, 4);
 
         let direction = &Direction::NORTH;
         let cell_opt = grid.get_adjacent_cell(&Coord::new(1, 2), direction);
@@ -319,7 +306,7 @@ mod tests {
 
     #[test]
     fn get_rand_coord() {
-        let grid: Grid = Griddy::new(2, 2);
+        let grid = Grid::new(2, 2);
         let mut count = 0;
         let max = 100;
         for _ in 0..max {
