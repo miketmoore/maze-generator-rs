@@ -23,18 +23,7 @@ pub fn carve_iterative(grid: &Grid) {
             println!("carve iterative - no walls available");
             if history.len() >= 2 {
                 println!("carve iterative - backtrack");
-                let backtracked_coord = history.pop();
-                if !backtracked_coord.is_some() {
-                    panic!("carve iterative - backtracked coord not found");
-                }
-            // let backtracked_cell = grid.cell(backtracked_coord.unwrap());
-            // backtracked_cell.mark_popped();
-            /*
-            cannot borrow `*backtracked_cell` as mutable, as it is behind a `&` reference
-
-            `backtracked_cell` is a `&` reference, so the data it refers to cannot be borrowed as mutablerustc(E0596)
-            carve_iterative.rs(32, 17): `backtracked_cell` is a `&` reference, so the data it refers to cannot be borrowed as mutable
-                            */
+                history.pop();
             } else {
                 println!("carve iterative - end");
                 running = false;
