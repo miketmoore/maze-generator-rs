@@ -163,9 +163,62 @@ impl Grid {
         Coord::new(row, col)
     }
 
-    pub fn get_available_cell_walls(&self, cell: &Cell, coord: &Coord) -> [Option<&Wall>; 4] {
-        let walls: [Option<&Wall>; 4] = [None,None,None,None];
-        walls
+    /*
+      // available cell walls are walls that have not been carved and that are adjacent to a cell
+      // that has not been visited
+      public getAvailableCellWalls = (cell: ICell, cellCoord: ICoord) =>
+        cell
+          .getWalls()
+          .toArray()
+          .filter(wall => this.isWallAvailable(cellCoord, wall))
+    */
+    // pub fn get_available_cell_walls(&mut self, cell: &Cell, coord: &Coord) -> [Option<&Wall>; 4] {
+    //     let walls: [Option<&Wall>; 4] = [None,None,None,None];
+    //     walls
+    // }
+
+    pub fn carve_random_wall_from_available(
+        &mut self,
+        cell: &mut Cell,
+        coord: &Coord,
+    ) -> Option<Direction> {
+        let cell_walls = cell.walls();
+
+        // find available walls
+        let mut available_walls = Vec::new();
+        if self.is_wall_available(coord, cell_walls.north()) {
+            let north = cell_walls.north();
+            available_walls.push(north);
+        } else if self.is_wall_available(coord, cell_walls.east()) {
+            available_walls.push(cell_walls.east());
+        } else if self.is_wall_available(coord, cell_walls.south()) {
+            available_walls.push(cell_walls.south());
+        } else if self.is_wall_available(coord, cell_walls.west()) {
+            available_walls.push(cell_walls.west());
+        }
+
+        if available_walls.len() == 0 {
+            return None;
+        }
+
+        // get random wall
+        let mut rng = rand::thread_rng();
+        let wall_index = rng.gen_range(0, 4);
+
+        let wall;
+        if wall_index == 0 {
+            wall = cell_walls.north();
+        } else if wall_index == 1 {
+            wall = cell_walls.east();
+        } else if wall_index == 2 {
+            wall = cell_walls.south();
+        } else {
+            wall = cell_walls.west();
+        }
+
+        wall.carve();
+        let direction = wall.direction();
+        return Some(direction);
     }
 }
 
