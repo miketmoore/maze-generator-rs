@@ -7,6 +7,9 @@ pub trait WallsContainer {
     fn new() -> Self;
     fn to_vec(&self) -> Vec<&Wall>;
     fn north(&self) -> &Wall;
+    fn east(&self) -> &Wall;
+    fn south(&self) -> &Wall;
+    fn west(&self) -> &Wall;
     fn get_rand(walls: Vec<&Wall>) -> &Wall;
 }
 
@@ -16,6 +19,8 @@ pub struct Walls {
     east: Wall,
     south: Wall,
     west: Wall,
+    curr: Wall,
+    next: Wall,
 }
 
 impl WallsContainer for Walls {
@@ -29,6 +34,8 @@ impl WallsContainer for Walls {
             east,
             south,
             west,
+            curr: north,
+            next: east,
         };
     }
     fn to_vec(&self) -> Vec<&Wall> {
@@ -41,6 +48,15 @@ impl WallsContainer for Walls {
     }
     fn north(&self) -> &Wall {
         &self.north
+    }
+    fn east(&self) -> &Wall {
+        &self.east
+    }
+    fn south(&self) -> &Wall {
+        &self.south
+    }
+    fn west(&self) -> &Wall {
+        &self.west
     }
     fn get_rand(walls: Vec<&Wall>) -> &Wall {
         let mut rng = rand::thread_rng();

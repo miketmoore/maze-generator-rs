@@ -29,6 +29,7 @@ pub trait Griddy<'a> {
     fn col_in_bounds(&self, col: i32) -> bool;
     fn coord_in_bounds(&self, coord: &Coord) -> bool;
     fn get_rand_coord(&self) -> Coord;
+    fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool;
 }
 
 impl<'a> Griddy<'a> for Grid {
@@ -118,19 +119,28 @@ impl<'a> Griddy<'a> for Grid {
             None
         }
     }
+    fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool {
+        if wall.state().is_solid() {
+            let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
+            if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
+                return true;
+            }
+        }
+        false
+    }
     fn get_available_cell_walls(&self, coord: &'a Coord, cell: &'a Cell) -> Vec<&'a Wall> {
         let mut results: Vec<&Wall> = Vec::new();
 
         let cell_walls = cell.walls();
-        let cell_walls_vec = cell_walls.to_vec();
 
-        for wall in cell_walls_vec {
-            if wall.state().is_solid() {
-                let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
-                if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
-                    results.push(wall);
-                }
-            }
+        if self.is_wall_available(coord, cell_walls.north()) {
+            results.push(cell_walls.north());
+        } else if self.is_wall_available(coord, cell_walls.east()) {
+            results.push(cell_walls.east());
+        } else if self.is_wall_available(coord, cell_walls.south()) {
+            results.push(cell_walls.south());
+        } else if self.is_wall_available(coord, cell_walls.west()) {
+            results.push(cell_walls.west());
         }
 
         results
