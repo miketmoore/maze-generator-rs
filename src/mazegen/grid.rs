@@ -2,6 +2,7 @@ use crate::mazegen::cell::Cell;
 use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
+use crate::mazegen::walls::Walls;
 use crate::mazegen::walls::WallsContainer;
 use rand::Rng;
 use std::collections::HashMap;
@@ -19,11 +20,13 @@ impl Grid {
     }
 }
 
-pub trait Griddy<'a> {
+pub trait Griddy {
     fn new(rows: i32, cols: i32) -> Self;
     fn cell(&self, coord: &Coord) -> &Cell;
-    fn get_available_cell_walls(&self, coord: &'a Coord, cell: &'a Cell) -> Vec<&'a Wall>;
+    fn cell_mut(&mut self, coord: &Coord) -> &mut Cell;
+    fn get_available_cell_walls<'a>(&mut self, coord: &'a Coord, cell: &'a mut Cell, results: &mut Vec<&'a mut Wall>) -> ();
     fn get_adjacent_cell(&self, coord: &Coord, direction: &Direction) -> Option<&Cell>;
+    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: &Direction) -> Option<&Cell>;
     fn get_adjacent_cell_coord(&self, coord: &Coord, direction: &Direction) -> Option<Coord>;
     fn row_in_bounds(&self, row: i32) -> bool;
     fn col_in_bounds(&self, col: i32) -> bool;
@@ -32,7 +35,7 @@ pub trait Griddy<'a> {
     fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool;
 }
 
-impl<'a> Griddy<'a> for Grid {
+impl Griddy for Grid {
     fn new(rows: i32, cols: i32) -> Self {
         let mut cells = HashMap::new();
 
@@ -47,6 +50,14 @@ impl<'a> Griddy<'a> for Grid {
     fn cell(&self, coord: &Coord) -> &Cell {
         let key = Grid::key(coord.row(), coord.col());
         let opt = self.cells.get(&key);
+        if !opt.is_some() {
+            panic!("cell not found");
+        }
+        opt.unwrap()
+    }
+    fn cell_mut(&mut self, coord: &Coord) -> &mut Cell {
+        let key = Grid::key(coord.row(), coord.col());
+        let opt = self.cells.get_mut(&key);
         if !opt.is_some() {
             panic!("cell not found");
         }
@@ -119,6 +130,23 @@ impl<'a> Griddy<'a> for Grid {
             None
         }
     }
+    /**
+     * Return the cell that is adjacent to the specified wall.
+     */
+    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: &Direction) -> Option<&Cell> {
+        let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
+        if !adjacent_coords_opt.is_some() {
+            return None;
+        }
+        let adjacent_coords = adjacent_coords_opt.unwrap();
+
+        if self.coord_in_bounds(&adjacent_coords) {
+            let adjacent_cell = self.cell(&adjacent_coords);
+            Some(adjacent_cell)
+        } else {
+            None
+        }
+    }
     fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool {
         if wall.is_solid() {
             let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
@@ -128,13 +156,12 @@ impl<'a> Griddy<'a> for Grid {
         }
         false
     }
-    fn get_available_cell_walls(&self, coord: &'a Coord, cell: &'a Cell) -> Vec<&'a Wall> {
-        let mut results: Vec<&Wall> = Vec::new();
-
+    fn get_available_cell_walls<'a>(&mut self, coord: &'a Coord, cell: &'a mut Cell, results: &mut Vec<&'a mut Wall>) -> () {
         let cell_walls = cell.walls();
 
         if self.is_wall_available(coord, cell_walls.north()) {
-            results.push(cell_walls.north());
+            let north = cell_walls.north();
+            results.push(north);
         } else if self.is_wall_available(coord, cell_walls.east()) {
             results.push(cell_walls.east());
         } else if self.is_wall_available(coord, cell_walls.south()) {
@@ -142,8 +169,6 @@ impl<'a> Griddy<'a> for Grid {
         } else if self.is_wall_available(coord, cell_walls.west()) {
             results.push(cell_walls.west());
         }
-
-        results
     }
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
     fn get_rand_coord(&self) -> Coord {

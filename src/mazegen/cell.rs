@@ -14,8 +14,8 @@ impl Cell {
             walls: WallsContainer::new(),
         }
     }
-    pub fn walls(&self) -> &Walls {
-        &self.walls
+    pub fn walls(&mut self) -> &mut Walls {
+        &mut self.walls
     }
     pub fn mark_visited(&mut self) {
         self.visited = true;
@@ -43,7 +43,7 @@ mod tests {
 
     #[test]
     fn walls() {
-        let cell = Cell::new();
+        let mut cell = Cell::new();
         // TODO how to assert walls?
 
         let got = cell.walls();

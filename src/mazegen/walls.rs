@@ -3,14 +3,14 @@ use crate::mazegen::wall::Wall;
 use rand::Rng;
 use std::vec::Vec;
 
-pub trait WallsContainer {
+pub trait WallsContainer<'a> {
     fn new() -> Self;
     fn to_vec(&self) -> Vec<&Wall>;
-    fn north(&self) -> &Wall;
-    fn east(&self) -> &Wall;
-    fn south(&self) -> &Wall;
-    fn west(&self) -> &Wall;
-    fn get_rand(walls: Vec<&Wall>) -> &Wall;
+    fn north(&mut self) -> &mut Wall;
+    fn east(&mut self) -> &mut Wall;
+    fn south(&mut self) -> &mut Wall;
+    fn west(&mut self) -> &mut Wall;
+    fn get_rand(walls: &'a mut Vec<&mut Wall>) -> &'a mut Wall;
 }
 
 #[derive(Copy, Clone)]
@@ -23,7 +23,7 @@ pub struct Walls {
     next: Wall,
 }
 
-impl WallsContainer for Walls {
+impl<'a> WallsContainer<'a> for Walls {
     fn new() -> Self {
         let north = Wall::new(Direction::NORTH);
         let east = Wall::new(Direction::EAST);
@@ -46,22 +46,24 @@ impl WallsContainer for Walls {
         v.push(&self.west);
         v
     }
-    fn north(&self) -> &Wall {
-        &self.north
+    fn north(&mut self) -> &mut Wall {
+        &mut self.north
     }
-    fn east(&self) -> &Wall {
-        &self.east
+    fn east(&mut self) -> &mut Wall {
+        &mut self.east
     }
-    fn south(&self) -> &Wall {
-        &self.south
+    fn south(&mut self) -> &mut Wall {
+        &mut self.south
     }
-    fn west(&self) -> &Wall {
-        &self.west
+    fn west(&mut self) -> &mut Wall {
+        &mut self.west
     }
-    fn get_rand(walls: Vec<&Wall>) -> &Wall {
+    fn get_rand(walls: &'a mut Vec<&mut Wall>) -> &'a mut Wall {
         let mut rng = rand::thread_rng();
         let i = rng.gen_range(0, 4);
-        walls.get(i).unwrap()
+        let wall_opt = walls.get_mut(i);
+        let wall = wall_opt.unwrap();
+        wall
     }
 }
 

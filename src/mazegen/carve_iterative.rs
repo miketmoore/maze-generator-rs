@@ -1,9 +1,12 @@
 use crate::mazegen::coord::Coord;
 use crate::mazegen::grid::Grid;
 use crate::mazegen::grid::Griddy;
+use crate::mazegen::wall::Wall;
+use crate::mazegen::walls::Walls;
+use crate::mazegen::walls::WallsContainer;
 use std::vec::Vec;
 
-pub fn carve_iterative(grid: &Grid) {
+pub fn carve_iterative(grid: &mut Grid) {
     println!("carve iterative start");
 
     let mut history: Vec<&Coord> = Vec::new();
@@ -15,9 +18,18 @@ pub fn carve_iterative(grid: &Grid) {
     while running {
         println!("carve iterative loop start");
         let coord = history[history.len() - 1];
-        let cell = grid.cell(&coord);
+        let cell = grid.cell_mut(&coord);
 
-        let walls = grid.get_available_cell_walls(coord, &cell);
+        let walls: &mut Vec<&mut Wall> = &mut Vec::new();
+/*
+cannot borrow `*grid` as mutable more than once at a time
+
+second mutable borrow occurs hererustc(E0499)
+carve_iterative.rs(21, 20): first mutable borrow occurs here
+carve_iterative.rs(24, 9): second mutable borrow occurs here
+carve_iterative.rs(24, 46): first borrow later used here
+*/
+        grid.get_available_cell_walls(coord, cell, walls);
 
         if walls.len() == 0 {
             println!("carve iterative - no walls available");
@@ -31,9 +43,9 @@ pub fn carve_iterative(grid: &Grid) {
         } else {
             println!("carve iterative - walls are available - TODO not implemented yet");
             running = false; // TODO temporary
-                             // let mut wall = Walls::get_rand(walls);
-                             // wall.carve();
-                             // cell.mark_visited();
+            let wall = Walls::get_rand(walls);
+            wall.carve();
+            cell.mark_visited();
 
             // let adjacent_cell = grid.get_adjacent_cell(&wall.direction(), cell);
             // if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
