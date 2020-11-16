@@ -93,7 +93,7 @@ impl Grid {
     /**
      * Return the cell that is adjacent to the specified wall.
      */
-    fn get_adjacent_coord(&self, coord: &Coord, direction: Direction) -> Option<Coord> {
+    pub fn get_adjacent_coord(&self, coord: &Coord, direction: Direction) -> Option<Coord> {
         let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
         if !adjacent_coords_opt.is_some() {
             return None;
