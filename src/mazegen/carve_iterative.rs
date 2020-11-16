@@ -41,7 +41,6 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
         }
 
         let coord = coord_opt.unwrap();
-        // let cell = cell_opt.unwrap();
 
         // what is actually needed here
         // walls length (total available for cell at coord)
