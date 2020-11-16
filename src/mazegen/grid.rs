@@ -29,11 +29,10 @@ impl Grid {
     }
     fn cell(&self, coord: &Coord) -> &Cell {
         let key = Grid::key(coord.row(), coord.col());
-        let opt = self.cells.get(&key);
-        if !opt.is_some() {
-            panic!("cell not found");
+        match self.cells.get(&key) {
+            Some(cell) => cell,
+            None => panic!("cell not found"),
         }
-        opt.unwrap()
     }
     pub fn cell_mut(&mut self, coord: &Coord) -> Option<&mut Cell> {
         let key = Grid::key(coord.row(), coord.col());
@@ -161,22 +160,30 @@ impl Grid {
         let direction;
         if available_directions.len() == 1 {
             // there is only one wall so we just select it... not random at this point
-            direction = available_directions.get(0).unwrap();
+            direction = match available_directions.get(0) {
+                Some(direction) => direction,
+                None => panic!("direction not found"),
+            }
         } else {
             // get a random from available
             let mut rng = rand::thread_rng();
             let wall_index = rng.gen_range(0, available_directions.len() - 1);
-            direction = available_directions.get(wall_index).unwrap();
+            direction = match available_directions.get(wall_index) {
+                Some(direction) => direction,
+                None => panic!("direction not found"),
+            }
         }
 
         // carve the wall
-        let cell = self.cell_mut(coord).unwrap();
-        match direction {
-            Direction::NORTH => cell.walls_mut().north_mut().carve(),
-            Direction::EAST => cell.walls_mut().east_mut().carve(),
-            Direction::SOUTH => cell.walls_mut().south_mut().carve(),
-            Direction::WEST => cell.walls_mut().west_mut().carve(),
-        }
+        match self.cell_mut(coord) {
+            Some(cell) => match direction {
+                Direction::NORTH => cell.walls_mut().north_mut().carve(),
+                Direction::EAST => cell.walls_mut().east_mut().carve(),
+                Direction::SOUTH => cell.walls_mut().south_mut().carve(),
+                Direction::WEST => cell.walls_mut().west_mut().carve(),
+            },
+            None => panic!("cell not found"),
+        };
 
         Some(*direction)
     }
