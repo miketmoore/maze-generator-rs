@@ -113,8 +113,6 @@ impl Grid {
         let mut rng = rand::thread_rng();
         let row = rng.gen_range(0, self.rows);
         let col = rng.gen_range(0, self.cols);
-        // let key = Grid::key(row, col);
-        // self.cells.get(&key).unwrap().coord()
         Coord::new(row, col)
     }
 
@@ -153,11 +151,7 @@ impl Grid {
 
     // available cell walls are walls that have not been carved and that are adjacent to a cell
     // that has not been visited
-    pub fn carve_random_wall_from_available(
-        &mut self,
-        // cell: &mut Cell,
-        coord: &Coord,
-    ) -> Option<Direction> {
+    pub fn carve_random_wall_from_available(&mut self, coord: &Coord) -> Option<Direction> {
         // we have a coord
         // we want to get a list of all solid walls for the cell at that coord
         let available_directions = self.get_available_directions_at_coord(coord);
