@@ -21,43 +21,43 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
             None => panic!("coord not found"),
         };
 
-        let random_direction_opt = grid.carve_random_wall_from_available(coord);
+        match grid.carve_random_wall_from_available(coord) {
+            Some(random_direction) => {
+                log(verbose, "walls are available");
+                let cell = grid.cell_mut(coord).unwrap();
+                cell.mark_visited();
 
-        if !random_direction_opt.is_some() {
-            log(verbose, "no walls available");
-            if history.len() >= 2 {
-                log(verbose, "backtrack");
-                history.pop();
-            } else {
-                log(verbose, "end");
-                running = false;
-            }
-        } else {
-            log(verbose, "walls are available");
-            let cell = grid.cell_mut(coord).unwrap();
-            cell.mark_visited();
-
-            let random_direction = random_direction_opt.unwrap();
-            match grid.get_adjacent_coord(coord, random_direction) {
-                Some(adjacent_coord) => {
-                    match grid.cell_mut(&adjacent_coord) {
-                        Some(adjacent_cell) => {
-                            log(verbose, "found adjacent cell");
-                            if !adjacent_cell.visited() {
-                                log(verbose, "carving opposite wall");
-                                let opp_direction = Direction::get_opposite(random_direction);
-                                let adjacent_walls = adjacent_cell.walls_mut();
-                                Walls::carve_opposite(opp_direction, adjacent_walls);
-                                adjacent_cell.mark_visited();
-                                history.push(adjacent_coord);
+                match grid.get_adjacent_coord(coord, random_direction) {
+                    Some(adjacent_coord) => {
+                        match grid.cell_mut(&adjacent_coord) {
+                            Some(adjacent_cell) => {
+                                log(verbose, "found adjacent cell");
+                                if !adjacent_cell.visited() {
+                                    log(verbose, "carving opposite wall");
+                                    let opp_direction = Direction::get_opposite(random_direction);
+                                    let adjacent_walls = adjacent_cell.walls_mut();
+                                    Walls::carve_opposite(opp_direction, adjacent_walls);
+                                    adjacent_cell.mark_visited();
+                                    history.push(adjacent_coord);
+                                }
                             }
-                        }
-                        _ => (),
-                    };
+                            _ => (),
+                        };
+                    }
+                    _ => (),
+                };
+            }
+            None => {
+                log(verbose, "no walls available");
+                if history.len() >= 2 {
+                    log(verbose, "backtrack");
+                    history.pop();
+                } else {
+                    log(verbose, "end");
+                    running = false;
                 }
-                _ => (),
-            };
-        }
+            }
+        };
     }
 }
 
