@@ -61,18 +61,20 @@ pub fn carve_iterative(rows: i32, cols: i32) {
             let adjacent_coord = grid.get_adjacent_coord(coord, result.unwrap());
             if adjacent_coord.is_some() {
                 let adjacent_cell_opt = grid.cell_mut(&adjacent_coord.unwrap());
-                if adjacent_cell_opt.is_some() && !adjacent_cell_opt.unwrap().visited() {
-                    let opp_direction = get_opposite_direction(result.unwrap());
+                if adjacent_cell_opt.is_some() {
                     let adjacent_cell = adjacent_cell_opt.unwrap();
-                    let adjacent_walls = adjacent_cell.walls_mut();
-                    match opp_direction {
-                        Direction::NORTH => adjacent_walls.north_mut().carve(),
-                        Direction::EAST => adjacent_walls.east_mut().carve(),
-                        Direction::SOUTH => adjacent_walls.south_mut().carve(),
-                        Direction::WEST => adjacent_walls.west_mut().carve(),
+                    if !adjacent_cell.visited() {
+                        let opp_direction = get_opposite_direction(result.unwrap());
+                        let adjacent_walls = adjacent_cell.walls_mut();
+                        match opp_direction {
+                            Direction::NORTH => adjacent_walls.north_mut().carve(),
+                            Direction::EAST => adjacent_walls.east_mut().carve(),
+                            Direction::SOUTH => adjacent_walls.south_mut().carve(),
+                            Direction::WEST => adjacent_walls.west_mut().carve(),
+                        }
+                        adjacent_cell.mark_visited();
+                        history.push(adjacent_coord.unwrap());
                     }
-                    adjacent_cell.mark_visited();
-                    history.push(adjacent_coord.unwrap());
                 }
             }
 
