@@ -1,7 +1,6 @@
 use crate::mazegen::cell::Cell;
 use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
-use crate::mazegen::wall::Wall;
 use crate::mazegen::walls::WallsContainer;
 use rand::Rng;
 use std::collections::HashMap;
@@ -108,35 +107,6 @@ impl Grid {
             None
         }
     }
-    /**
-     * Return the cell that is adjacent to the specified wall.
-     */
-    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: Direction) -> Option<&Cell> {
-        let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
-        if !adjacent_coords_opt.is_some() {
-            return None;
-        }
-        let adjacent_coords = adjacent_coords_opt.unwrap();
-
-        if self.coord_in_bounds(&adjacent_coords) {
-            let adjacent_cell = self.cell(&adjacent_coords);
-            Some(adjacent_cell)
-        } else {
-            None
-        }
-    }
-    // fn is_wall_available(&self, coord: &Coord, is_solid: bool, direction: Direction) -> bool {
-    //     if is_solid {
-    //         let adjacent_coord_opt = self.get_adjacent_coord(coord, direction);
-    //         if adjacent_coord_opt.is_some() {
-    //             let adjacent_cell = self.cell(adjacent_coord_opt.unwrap());
-    //             if !adjacent_cell.visited() {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     false
-    // }
 
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
     pub fn get_rand_coord(&self) -> Coord {
@@ -226,34 +196,34 @@ mod tests {
     use crate::mazegen::direction::Direction;
     use crate::mazegen::grid::Grid;
 
-    #[test]
-    fn cell() {
-        /*
-               0   1   2   3
-           0|0,0|0,1|0,2|0,3|
-           1|1,0|1,1|1,2|1,3|
-        */
-        let grid = Grid::new(2, 4);
+    // #[test]
+    // fn cell() {
+    //     /*
+    //            0   1   2   3
+    //        0|0,0|0,1|0,2|0,3|
+    //        1|1,0|1,1|1,2|1,3|
+    //     */
+    //     let grid = Grid::new(2, 4);
 
-        let tests: [[i32; 2]; 8] = [
-            [0, 0],
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [1, 0],
-            [1, 1],
-            [1, 2],
-            [1, 3],
-        ];
+    //     let tests: [[i32; 2]; 8] = [
+    //         [0, 0],
+    //         [0, 1],
+    //         [0, 2],
+    //         [0, 3],
+    //         [1, 0],
+    //         [1, 1],
+    //         [1, 2],
+    //         [1, 3],
+    //     ];
 
-        for test in tests.iter() {
-            let coord = Coord::new(test[0], test[1]);
-            let cell = grid.cell(&coord);
-            // TODO
-            // assert_eq!(cell.coord().row(), test[0]);
-            // assert_eq!(cell.coord().col(), test[1]);
-        }
-    }
+    //     for test in tests.iter() {
+    //         let coord = Coord::new(test[0], test[1]);
+    //         let cell = grid.cell(&coord);
+    //         // TODO
+    //         // assert_eq!(cell.coord().row(), test[0]);
+    //         // assert_eq!(cell.coord().col(), test[1]);
+    //     }
+    // }
 
     #[test]
     fn row_in_bounds() {

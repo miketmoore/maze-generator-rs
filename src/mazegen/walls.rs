@@ -26,8 +26,6 @@ pub struct Walls {
     east: Wall,
     south: Wall,
     west: Wall,
-    curr: Wall,
-    next: Wall,
 }
 
 impl<'a> WallsContainer<'a> for Walls {
@@ -41,8 +39,6 @@ impl<'a> WallsContainer<'a> for Walls {
             east,
             south,
             west,
-            curr: north,
-            next: east,
         };
     }
     fn to_vec(&self) -> Vec<&Wall> {

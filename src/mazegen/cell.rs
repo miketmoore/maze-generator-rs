@@ -26,32 +26,22 @@ impl Cell {
     pub fn visited(&self) -> bool {
         return self.visited == true;
     }
-    fn get_opposite_wall_index(&self, wall: i32) -> i32 {
-        if wall == 0 {
-            return 2;
-        } else if wall == 1 {
-            return 3;
-        } else if wall == 2 {
-            return 0;
-        }
-        return 1;
-    }
 }
 
 #[cfg(test)]
 mod tests {
 
     use crate::mazegen::cell::Cell;
-    use crate::mazegen::walls::WallsContainer;
+    // use crate::mazegen::walls::WallsContainer;
 
-    #[test]
-    fn walls() {
-        let mut cell = Cell::new();
-        // TODO how to assert walls?
+    // #[test]
+    // fn walls() {
+    //     let mut cell = Cell::new();
+    //     // TODO how to assert walls?
 
-        let got = cell.walls();
-        assert_eq!(got.north().is_solid(), true);
-    }
+    //     let got = cell.walls();
+    //     assert_eq!(got.north().is_solid(), true);
+    // }
 
     #[test]
     fn visited_field() {
@@ -60,14 +50,5 @@ mod tests {
         assert_eq!(cell.visited(), false);
         cell.mark_visited();
         assert_eq!(cell.visited(), true);
-    }
-
-    #[test]
-    fn get_opposite_wall_index() {
-        let cell = Cell::new();
-        assert_eq!(cell.get_opposite_wall_index(0), 2);
-        assert_eq!(cell.get_opposite_wall_index(1), 3);
-        assert_eq!(cell.get_opposite_wall_index(2), 0);
-        assert_eq!(cell.get_opposite_wall_index(3), 1);
     }
 }

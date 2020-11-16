@@ -14,9 +14,6 @@ impl Wall {
             solid: true,
         };
     }
-    pub fn direction(&self) -> Direction {
-        self.direction
-    }
     pub fn carve(&mut self) -> () {
         self.solid = false;
     }
