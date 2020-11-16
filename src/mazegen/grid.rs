@@ -100,8 +100,6 @@ impl Grid {
         let adjacent_coords = adjacent_coords_opt.unwrap();
 
         if self.coord_in_bounds(&adjacent_coords) {
-            // let adjacent_cell = self.cell(&adjacent_coords);
-            // Some(adjacent_cell)
             Some(adjacent_coords)
         } else {
             None
