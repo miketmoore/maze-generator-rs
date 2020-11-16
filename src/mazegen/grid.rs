@@ -154,7 +154,12 @@ impl Grid {
 
         let mut result = Vec::new();
 
-        for direction in &[Direction::NORTH, Direction::EAST, Direction::SOUTH, Direction::WEST] {
+        for direction in &[
+            Direction::NORTH,
+            Direction::EAST,
+            Direction::SOUTH,
+            Direction::WEST,
+        ] {
             let wall;
             match direction {
                 Direction::NORTH => wall = walls.north(),
@@ -186,7 +191,7 @@ impl Grid {
         // we have a coord
         // we want to get a list of all solid walls for the cell at that coord
         let available_directions = self.get_available_directions_at_coord(coord);
-        
+
         if available_directions.len() == 0 {
             return None;
         }

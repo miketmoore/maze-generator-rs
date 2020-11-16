@@ -53,10 +53,18 @@ impl<'a> WallsContainer<'a> for Walls {
         v.push(&self.west);
         v
     }
-    fn north(&self) -> &Wall { &self.north }
-    fn east(&self) -> &Wall { &self.east }
-    fn south(&self) -> &Wall { &self.south }
-    fn west(&self) -> &Wall { &self.west }
+    fn north(&self) -> &Wall {
+        &self.north
+    }
+    fn east(&self) -> &Wall {
+        &self.east
+    }
+    fn south(&self) -> &Wall {
+        &self.south
+    }
+    fn west(&self) -> &Wall {
+        &self.west
+    }
     fn north_mut(&mut self) -> &mut Wall {
         &mut self.north
     }
