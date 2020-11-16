@@ -1,23 +1,8 @@
 use crate::mazegen::coord::Coord;
 use crate::mazegen::direction::Direction;
 use crate::mazegen::grid::Grid;
-use crate::mazegen::walls::WallsContainer;
+use crate::mazegen::walls::Walls;
 use std::vec::Vec;
-
-pub fn get_opposite_direction(direction: Direction) -> Direction {
-    match direction {
-        Direction::NORTH => Direction::SOUTH,
-        Direction::EAST => Direction::WEST,
-        Direction::SOUTH => Direction::NORTH,
-        Direction::WEST => Direction::EAST,
-    }
-}
-
-fn log(enabled: bool, msg: &str) -> () {
-    if enabled {
-        println!("MAZEGEN_DEBUG {}", msg);
-    }
-}
 
 pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
     log(verbose, "start");
@@ -42,13 +27,9 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
 
         let coord = coord_opt.unwrap();
 
-        // what is actually needed here
-        // walls length (total available for cell at coord)
-        // find random wall from this list, carve it, and know it's direction
+        let random_direction_opt = grid.carve_random_wall_from_available(coord);
 
-        let result = grid.carve_random_wall_from_available(coord);
-
-        if !result.is_some() {
+        if !random_direction_opt.is_some() {
             log(verbose, "no walls available");
             if history.len() >= 2 {
                 log(verbose, "backtrack");
@@ -62,25 +43,29 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
             let cell = grid.cell_mut(coord).unwrap();
             cell.mark_visited();
 
-            let adjacent_coord = grid.get_adjacent_coord(coord, result.unwrap());
+            let random_direction = random_direction_opt.unwrap();
+            let adjacent_coord = grid.get_adjacent_coord(coord, random_direction);
             if adjacent_coord.is_some() {
                 let adjacent_cell_opt = grid.cell_mut(&adjacent_coord.unwrap());
                 if adjacent_cell_opt.is_some() {
+                    log(verbose, "found adjacent cell");
                     let adjacent_cell = adjacent_cell_opt.unwrap();
                     if !adjacent_cell.visited() {
-                        let opp_direction = get_opposite_direction(result.unwrap());
+                        log(verbose, "carving opposite wall");
+                        let opp_direction = Direction::get_opposite(random_direction);
                         let adjacent_walls = adjacent_cell.walls_mut();
-                        match opp_direction {
-                            Direction::NORTH => adjacent_walls.north_mut().carve(),
-                            Direction::EAST => adjacent_walls.east_mut().carve(),
-                            Direction::SOUTH => adjacent_walls.south_mut().carve(),
-                            Direction::WEST => adjacent_walls.west_mut().carve(),
-                        }
+                        Walls::carve_opposite(opp_direction, adjacent_walls);
                         adjacent_cell.mark_visited();
                         history.push(adjacent_coord.unwrap());
                     }
                 }
             }
         }
+    }
+}
+
+fn log(enabled: bool, msg: &str) -> () {
+    if enabled {
+        println!("MAZEGEN_DEBUG {}", msg);
     }
 }

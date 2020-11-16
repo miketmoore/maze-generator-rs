@@ -1,3 +1,4 @@
+use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
 use rand::Rng;
 use std::vec::Vec;
@@ -25,6 +26,17 @@ pub struct Walls {
     east: Wall,
     south: Wall,
     west: Wall,
+}
+
+impl Walls {
+    pub fn carve_opposite(direction: Direction, walls: &mut Walls) {
+        match direction {
+            Direction::NORTH => walls.north_mut().carve(),
+            Direction::EAST => walls.east_mut().carve(),
+            Direction::SOUTH => walls.south_mut().carve(),
+            Direction::WEST => walls.west_mut().carve(),
+        }
+    }
 }
 
 impl<'a> WallsContainer<'a> for Walls {
