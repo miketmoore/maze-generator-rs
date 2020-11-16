@@ -133,12 +133,14 @@ impl Grid {
                 Direction::WEST => wall = walls.west(),
             }
             if wall.is_solid() {
-                let adjacent_coord_opt = self.get_adjacent_coord(coord, *direction);
-                if adjacent_coord_opt.is_some() {
-                    let adjacent_cell = self.cell(&adjacent_coord_opt.unwrap());
-                    if !adjacent_cell.visited() {
-                        result.push(*direction);
+                match self.get_adjacent_coord(coord, *direction) {
+                    Some(adjacent_coord) => {
+                        let adjacent_cell = self.cell(&adjacent_coord);
+                        if !adjacent_cell.visited() {
+                            result.push(*direction);
+                        }
                     }
+                    None => (),
                 }
             }
         }
