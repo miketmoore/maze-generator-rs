@@ -191,12 +191,18 @@ impl Grid {
             return None;
         }
 
-        // get a random from available
-        let mut rng = rand::thread_rng();
-        let wall_index = rng.gen_range(0, available_directions.len() - 1);
-        let direction = available_directions.get(wall_index).unwrap();
+        let direction;
+        if available_directions.len() == 1 {
+            // there is only one wall so we just select it... not random at this point
+            direction = available_directions.get(0).unwrap();
+        } else {
+            // get a random from available
+            let mut rng = rand::thread_rng();
+            let wall_index = rng.gen_range(0, available_directions.len() - 1);
+            direction = available_directions.get(wall_index).unwrap();
+        }
 
-        // then we want to carve a random wall
+        // carve the wall
         let cell = self.cell_mut(coord).unwrap();
         match direction {
             Direction::NORTH => cell.walls_mut().north_mut().carve(),
