@@ -41,10 +41,10 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
                                     history.push(adjacent_coord);
                                 }
                             }
-                            _ => (),
+                            None => (),
                         };
                     }
-                    _ => (),
+                    None => (),
                 };
             }
             None => {
