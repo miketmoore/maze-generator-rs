@@ -38,22 +38,25 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
             cell.mark_visited();
 
             let random_direction = random_direction_opt.unwrap();
-            let adjacent_coord = grid.get_adjacent_coord(coord, random_direction);
-            if adjacent_coord.is_some() {
-                let adjacent_cell_opt = grid.cell_mut(&adjacent_coord.unwrap());
-                if adjacent_cell_opt.is_some() {
-                    log(verbose, "found adjacent cell");
-                    let adjacent_cell = adjacent_cell_opt.unwrap();
-                    if !adjacent_cell.visited() {
-                        log(verbose, "carving opposite wall");
-                        let opp_direction = Direction::get_opposite(random_direction);
-                        let adjacent_walls = adjacent_cell.walls_mut();
-                        Walls::carve_opposite(opp_direction, adjacent_walls);
-                        adjacent_cell.mark_visited();
-                        history.push(adjacent_coord.unwrap());
-                    }
+            match grid.get_adjacent_coord(coord, random_direction) {
+                Some(adjacent_coord) => {
+                    match grid.cell_mut(&adjacent_coord) {
+                        Some(adjacent_cell) => {
+                            log(verbose, "found adjacent cell");
+                            if !adjacent_cell.visited() {
+                                log(verbose, "carving opposite wall");
+                                let opp_direction = Direction::get_opposite(random_direction);
+                                let adjacent_walls = adjacent_cell.walls_mut();
+                                Walls::carve_opposite(opp_direction, adjacent_walls);
+                                adjacent_cell.mark_visited();
+                                history.push(adjacent_coord);
+                            }
+                        }
+                        _ => (),
+                    };
                 }
-            }
+                _ => (),
+            };
         }
     }
 }
