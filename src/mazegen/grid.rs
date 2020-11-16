@@ -178,12 +178,9 @@ impl Grid {
 
         // carve the wall
         match self.cell_mut(coord) {
-            Some(cell) => match direction {
-                Direction::NORTH => cell.walls_mut().north_mut().carve(),
-                Direction::EAST => cell.walls_mut().east_mut().carve(),
-                Direction::SOUTH => cell.walls_mut().south_mut().carve(),
-                Direction::WEST => cell.walls_mut().west_mut().carve(),
-            },
+            Some(cell) => {
+                cell.carve_wall(&direction);
+            }
             None => panic!("cell not found"),
         };
 

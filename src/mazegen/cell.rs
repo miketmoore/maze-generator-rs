@@ -1,3 +1,4 @@
+use crate::mazegen::direction::Direction;
 use crate::mazegen::walls::Walls;
 use crate::mazegen::walls::WallsContainer;
 
@@ -25,6 +26,15 @@ impl Cell {
     }
     pub fn visited(&self) -> bool {
         return self.visited == true;
+    }
+
+    pub fn carve_wall(&mut self, direction: &Direction) {
+        match direction {
+            Direction::NORTH => self.walls_mut().north_mut().carve(),
+            Direction::EAST => self.walls_mut().east_mut().carve(),
+            Direction::SOUTH => self.walls_mut().south_mut().carve(),
+            Direction::WEST => self.walls_mut().west_mut().carve(),
+        };
     }
 }
 
