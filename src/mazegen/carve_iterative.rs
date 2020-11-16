@@ -44,7 +44,21 @@ pub fn carve_iterative(rows: i32, cols: i32) {
             }
         } else {
             println!("carve iterative - walls are available");
-            // TODO
+            let cell = grid.cell_mut(coord).unwrap();
+            cell.mark_visited();
+
+            /*
+      const adjacentCoord = grid.getAdjacentCoord(wall.getDirection(), coord)
+      if (adjacentCoord) {
+        const adjacentCell = grid.getCell(adjacentCoord)
+        if (adjacentCell && !adjacentCell.isVisited()) {
+          const oppDir = getOppositeDirection(wall.getDirection())
+          adjacentCell.getWalls()[oppDir].carve()
+          adjacentCell.markVisited()
+          history.push(adjacentCoord)
+        }
+      }
+            */
         }
 
         // cannot borrow `grid` as mutable more than once at a time

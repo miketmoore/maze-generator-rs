@@ -6,10 +6,17 @@ use std::vec::Vec;
 pub trait WallsContainer<'a> {
     fn new() -> Self;
     fn to_vec(&self) -> Vec<&Wall>;
-    fn north(&mut self) -> &mut Wall;
-    fn east(&mut self) -> &mut Wall;
-    fn south(&mut self) -> &mut Wall;
-    fn west(&mut self) -> &mut Wall;
+
+    fn north(&self) -> &Wall;
+    fn east(&self) -> &Wall;
+    fn south(&self) -> &Wall;
+    fn west(&self) -> &Wall;
+
+    fn north_mut(&mut self) -> &mut Wall;
+    fn east_mut(&mut self) -> &mut Wall;
+    fn south_mut(&mut self) -> &mut Wall;
+    fn west_mut(&mut self) -> &mut Wall;
+
     fn get_rand(walls: &'a mut Vec<&mut Wall>) -> &'a mut Wall;
 }
 
@@ -46,16 +53,20 @@ impl<'a> WallsContainer<'a> for Walls {
         v.push(&self.west);
         v
     }
-    fn north(&mut self) -> &mut Wall {
+    fn north(&self) -> &Wall { &self.north }
+    fn east(&self) -> &Wall { &self.east }
+    fn south(&self) -> &Wall { &self.south }
+    fn west(&self) -> &Wall { &self.west }
+    fn north_mut(&mut self) -> &mut Wall {
         &mut self.north
     }
-    fn east(&mut self) -> &mut Wall {
+    fn east_mut(&mut self) -> &mut Wall {
         &mut self.east
     }
-    fn south(&mut self) -> &mut Wall {
+    fn south_mut(&mut self) -> &mut Wall {
         &mut self.south
     }
-    fn west(&mut self) -> &mut Wall {
+    fn west_mut(&mut self) -> &mut Wall {
         &mut self.west
     }
     fn get_rand(walls: &'a mut Vec<&mut Wall>) -> &'a mut Wall {

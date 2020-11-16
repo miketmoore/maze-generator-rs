@@ -14,7 +14,10 @@ impl Cell {
             walls: WallsContainer::new(),
         }
     }
-    pub fn walls(&mut self) -> &mut Walls {
+    pub fn walls(&self) -> &Walls {
+        &self.walls
+    }
+    pub fn walls_mut(&mut self) -> &mut Walls {
         &mut self.walls
     }
     pub fn mark_visited(&mut self) {

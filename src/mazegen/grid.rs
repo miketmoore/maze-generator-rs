@@ -51,7 +51,7 @@ impl Grid {
         let col = coord.col();
         self.row_in_bounds(row) && self.col_in_bounds(col)
     }
-    fn get_adjacent_cell_coord(&self, coord: &Coord, direction: &Direction) -> Option<Coord> {
+    fn get_adjacent_cell_coord(&self, coord: &Coord, direction: Direction) -> Option<Coord> {
         let row = coord.row();
         let col = coord.col();
         let mut new_row = row;
@@ -93,7 +93,7 @@ impl Grid {
     /**
      * Return the cell that is adjacent to the specified wall.
      */
-    fn get_adjacent_cell(&self, coord: &Coord, direction: &Direction) -> Option<&Cell> {
+    fn get_adjacent_coord(&self, coord: &Coord, direction: Direction) -> Option<Coord> {
         let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
         if !adjacent_coords_opt.is_some() {
             return None;
@@ -101,8 +101,9 @@ impl Grid {
         let adjacent_coords = adjacent_coords_opt.unwrap();
 
         if self.coord_in_bounds(&adjacent_coords) {
-            let adjacent_cell = self.cell(&adjacent_coords);
-            Some(adjacent_cell)
+            // let adjacent_cell = self.cell(&adjacent_coords);
+            // Some(adjacent_cell)
+            Some(adjacent_coords)
         } else {
             None
         }
@@ -110,7 +111,7 @@ impl Grid {
     /**
      * Return the cell that is adjacent to the specified wall.
      */
-    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: &Direction) -> Option<&Cell> {
+    fn get_adjacent_cell_mut(&mut self, coord: &Coord, direction: Direction) -> Option<&Cell> {
         let adjacent_coords_opt = self.get_adjacent_cell_coord(coord, direction);
         if !adjacent_coords_opt.is_some() {
             return None;
@@ -124,35 +125,19 @@ impl Grid {
             None
         }
     }
-    fn is_wall_available(&mut self, coord: &Coord, wall: &Wall) -> bool {
-        if wall.is_solid() {
-            let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
-            if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
-                return true;
-            }
-        }
-        false
-    }
-    // fn update_available_cell_walls_mut<'a>(
-    //     &mut self,
-    //     cell: &'a mut Cell,
-    //     coord: &Coord,
-    //     results: &'a mut Vec<&'a mut Wall>,
-    // ) -> () {
-    //     // cannot infer an appropriate lifetime for autoref due to conflicting requirements
-    //     let cell_walls = cell.walls();
-
-    //     if self.is_wall_available(coord, cell_walls.north()) {
-    //         let north = cell_walls.north();
-    //         results.push(north);
-    //     } else if self.is_wall_available(coord, cell_walls.east()) {
-    //         results.push(cell_walls.east());
-    //     } else if self.is_wall_available(coord, cell_walls.south()) {
-    //         results.push(cell_walls.south());
-    //     } else if self.is_wall_available(coord, cell_walls.west()) {
-    //         results.push(cell_walls.west());
+    // fn is_wall_available(&self, coord: &Coord, is_solid: bool, direction: Direction) -> bool {
+    //     if is_solid {
+    //         let adjacent_coord_opt = self.get_adjacent_coord(coord, direction);
+    //         if adjacent_coord_opt.is_some() {
+    //             let adjacent_cell = self.cell(adjacent_coord_opt.unwrap());
+    //             if !adjacent_cell.visited() {
+    //                 return true;
+    //             }
+    //         }
     //     }
+    //     false
     // }
+
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
     pub fn get_rand_coord(&self) -> Coord {
         let mut rng = rand::thread_rng();
@@ -163,63 +148,64 @@ impl Grid {
         Coord::new(row, col)
     }
 
-    /*
-      // available cell walls are walls that have not been carved and that are adjacent to a cell
-      // that has not been visited
-      public getAvailableCellWalls = (cell: ICell, cellCoord: ICoord) =>
-        cell
-          .getWalls()
-          .toArray()
-          .filter(wall => this.isWallAvailable(cellCoord, wall))
-    */
-    // pub fn get_available_cell_walls(&mut self, cell: &Cell, coord: &Coord) -> [Option<&Wall>; 4] {
-    //     let walls: [Option<&Wall>; 4] = [None,None,None,None];
-    //     walls
-    // }
+    pub fn get_available_directions_at_coord(&self, coord: &Coord) -> Vec<Direction> {
+        let cell = self.cell(coord);
+        let walls = cell.walls();
 
+        let mut result = Vec::new();
+
+        for direction in &[Direction::NORTH, Direction::EAST, Direction::SOUTH, Direction::WEST] {
+            let wall;
+            match direction {
+                Direction::NORTH => wall = walls.north(),
+                Direction::EAST => wall = walls.east(),
+                Direction::SOUTH => wall = walls.south(),
+                Direction::WEST => wall = walls.west(),
+            }
+            if wall.is_solid() {
+                let adjacent_coord_opt = self.get_adjacent_coord(coord, *direction);
+                if adjacent_coord_opt.is_some() {
+                    let adjacent_cell = self.cell(&adjacent_coord_opt.unwrap());
+                    if !adjacent_cell.visited() {
+                        result.push(*direction);
+                    }
+                }
+            }
+        }
+
+        result
+    }
+
+    // available cell walls are walls that have not been carved and that are adjacent to a cell
+    // that has not been visited
     pub fn carve_random_wall_from_available(
         &mut self,
         // cell: &mut Cell,
         coord: &Coord,
     ) -> Option<Direction> {
-        let cell = self.cell_mut(coord).unwrap();
-        let cell_walls = cell.walls();
-
-        // find available walls
-        let mut available_walls = Vec::new();
-        if self.is_wall_available(coord, cell_walls.north()) {
-            let north = cell_walls.north();
-            available_walls.push(north);
-        } else if self.is_wall_available(coord, cell_walls.east()) {
-            available_walls.push(cell_walls.east());
-        } else if self.is_wall_available(coord, cell_walls.south()) {
-            available_walls.push(cell_walls.south());
-        } else if self.is_wall_available(coord, cell_walls.west()) {
-            available_walls.push(cell_walls.west());
-        }
-
-        if available_walls.len() == 0 {
+        // we have a coord
+        // we want to get a list of all solid walls for the cell at that coord
+        let available_directions = self.get_available_directions_at_coord(coord);
+        
+        if available_directions.len() == 0 {
             return None;
         }
 
-        // get random wall
+        // get a random from available
         let mut rng = rand::thread_rng();
-        let wall_index = rng.gen_range(0, 4);
+        let wall_index = rng.gen_range(0, available_directions.len() - 1);
+        let direction = available_directions.get(wall_index).unwrap();
 
-        let wall;
-        if wall_index == 0 {
-            wall = cell_walls.north();
-        } else if wall_index == 1 {
-            wall = cell_walls.east();
-        } else if wall_index == 2 {
-            wall = cell_walls.south();
-        } else {
-            wall = cell_walls.west();
+        // then we want to carve a random wall
+        let cell = self.cell_mut(coord).unwrap();
+        match direction {
+            Direction::NORTH => cell.walls_mut().north_mut().carve(),
+            Direction::EAST => cell.walls_mut().east_mut().carve(),
+            Direction::SOUTH => cell.walls_mut().south_mut().carve(),
+            Direction::WEST => cell.walls_mut().west_mut().carve(),
         }
 
-        wall.carve();
-        let direction = wall.direction();
-        return Some(direction);
+        Some(*direction)
     }
 }
 
@@ -300,44 +286,44 @@ mod tests {
         {
             let coord_arg = &Coord::new(0, 0);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::NORTH);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::NORTH);
             assert_eq!(coord_opt.is_some(), false);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::EAST);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::EAST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 0);
             assert_eq!(coord.col(), 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::SOUTH);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::SOUTH);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
             assert_eq!(coord.col(), 0);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::WEST);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::WEST);
             assert_eq!(coord_opt.is_some(), false);
         }
 
         {
             let coord_arg = &Coord::new(1, 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::NORTH);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::NORTH);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 0);
             assert_eq!(coord.col(), 1);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::EAST);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::EAST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
             assert_eq!(coord.col(), 2);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::SOUTH);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::SOUTH);
             assert_eq!(coord_opt.is_some(), false);
 
-            coord_opt = grid.get_adjacent_cell_coord(coord_arg, &Direction::WEST);
+            coord_opt = grid.get_adjacent_cell_coord(coord_arg, Direction::WEST);
             assert_eq!(coord_opt.is_some(), true);
             coord = coord_opt.unwrap();
             assert_eq!(coord.row(), 1);
@@ -345,18 +331,18 @@ mod tests {
         }
     }
 
-    #[test]
-    fn get_adjacent_cell() {
-        let grid = Grid::new(2, 4);
+    // #[test]
+    // fn get_adjacent_cell() {
+    //     let grid = Grid::new(2, 4);
 
-        let direction = &Direction::NORTH;
-        let cell_opt = grid.get_adjacent_cell(&Coord::new(1, 2), direction);
-        assert_eq!(cell_opt.is_some(), true);
-        let cell = cell_opt.unwrap();
-        // TODO
-        // assert_eq!(cell.coord().row(), 1);
-        // assert_eq!(cell.coord().col(), 2);
-    }
+    //     let direction = &Direction::NORTH;
+    //     let cell_opt = grid.get_adjacent_cell(&Coord::new(1, 2), direction);
+    //     assert_eq!(cell_opt.is_some(), true);
+    //     let cell = cell_opt.unwrap();
+    //     // TODO
+    //     // assert_eq!(cell.coord().row(), 1);
+    //     // assert_eq!(cell.coord().col(), 2);
+    // }
 
     #[test]
     fn get_rand_coord() {
