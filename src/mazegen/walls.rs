@@ -1,4 +1,3 @@
-use crate::mazegen::direction::Direction;
 use crate::mazegen::wall::Wall;
 use rand::Rng;
 use std::vec::Vec;
@@ -30,10 +29,10 @@ pub struct Walls {
 
 impl<'a> WallsContainer<'a> for Walls {
     fn new() -> Self {
-        let north = Wall::new(Direction::NORTH);
-        let east = Wall::new(Direction::EAST);
-        let south = Wall::new(Direction::SOUTH);
-        let west = Wall::new(Direction::WEST);
+        let north = Wall::new();
+        let east = Wall::new();
+        let south = Wall::new();
+        let west = Wall::new();
         return Walls {
             north,
             east,
