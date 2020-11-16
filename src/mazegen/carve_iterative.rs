@@ -16,16 +16,10 @@ pub fn carve_iterative(rows: i32, cols: i32, verbose: bool) {
     let mut running = true;
     while running {
         log(verbose, "loop start");
-        let coord_opt = history.get(history.len() - 1);
-        if !coord_opt.is_some() {
-            panic!("coord not found");
-        }
-        let cell_opt = grid.cell_mut(coord_opt.unwrap());
-        if !cell_opt.is_some() {
-            panic!("cell not found");
-        }
-
-        let coord = coord_opt.unwrap();
+        let coord = match history.get(history.len() - 1) {
+            Some(coord) => coord,
+            None => panic!("coord not found"),
+        };
 
         let random_direction_opt = grid.carve_random_wall_from_available(coord);
 
