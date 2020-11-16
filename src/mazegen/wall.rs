@@ -5,7 +5,7 @@ pub struct Wall {
 
 impl Wall {
     pub fn new() -> Self {
-        return Wall { solid: true };
+        Wall { solid: true }
     }
     pub fn carve(&mut self) -> () {
         self.solid = false;

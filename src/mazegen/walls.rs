@@ -41,16 +41,12 @@ impl Walls {
 
 impl<'a> WallsContainer<'a> for Walls {
     fn new() -> Self {
-        let north = Wall::new();
-        let east = Wall::new();
-        let south = Wall::new();
-        let west = Wall::new();
-        return Walls {
-            north,
-            east,
-            south,
-            west,
-        };
+        Walls {
+            north: Wall::new(),
+            east: Wall::new(),
+            south: Wall::new(),
+            west: Wall::new(),
+        }
     }
     fn to_vec(&self) -> Vec<&Wall> {
         let mut v = Vec::new();
