@@ -25,13 +25,13 @@ pub fn carve_iterative(rows: i32, cols: i32) {
         }
 
         let coord = coord_opt.unwrap();
-        let cell = cell_opt.unwrap();
+        // let cell = cell_opt.unwrap();
 
         // what is actually needed here
         // walls length (total available for cell at coord)
         // find random wall from this list, carve it, and know it's direction
 
-        let result = grid.carve_random_wall_from_available(cell, coord);
+        let result = grid.carve_random_wall_from_available(coord);
 
         if !result.is_some() {
             println!("carve iterative - no walls available");

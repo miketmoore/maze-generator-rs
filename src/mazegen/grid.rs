@@ -124,7 +124,7 @@ impl Grid {
             None
         }
     }
-    fn is_wall_available(&self, coord: &Coord, wall: &Wall) -> bool {
+    fn is_wall_available(&mut self, coord: &Coord, wall: &Wall) -> bool {
         if wall.is_solid() {
             let adjacent_cell = self.get_adjacent_cell(coord, &wall.direction);
             if adjacent_cell.is_some() && !adjacent_cell.unwrap().visited() {
@@ -133,26 +133,26 @@ impl Grid {
         }
         false
     }
-    fn update_available_cell_walls_mut<'a>(
-        &mut self,
-        cell: &'a mut Cell,
-        coord: &Coord,
-        results: &'a mut Vec<&'a mut Wall>,
-    ) -> () {
-        // cannot infer an appropriate lifetime for autoref due to conflicting requirements
-        let cell_walls = cell.walls();
+    // fn update_available_cell_walls_mut<'a>(
+    //     &mut self,
+    //     cell: &'a mut Cell,
+    //     coord: &Coord,
+    //     results: &'a mut Vec<&'a mut Wall>,
+    // ) -> () {
+    //     // cannot infer an appropriate lifetime for autoref due to conflicting requirements
+    //     let cell_walls = cell.walls();
 
-        if self.is_wall_available(coord, cell_walls.north()) {
-            let north = cell_walls.north();
-            results.push(north);
-        } else if self.is_wall_available(coord, cell_walls.east()) {
-            results.push(cell_walls.east());
-        } else if self.is_wall_available(coord, cell_walls.south()) {
-            results.push(cell_walls.south());
-        } else if self.is_wall_available(coord, cell_walls.west()) {
-            results.push(cell_walls.west());
-        }
-    }
+    //     if self.is_wall_available(coord, cell_walls.north()) {
+    //         let north = cell_walls.north();
+    //         results.push(north);
+    //     } else if self.is_wall_available(coord, cell_walls.east()) {
+    //         results.push(cell_walls.east());
+    //     } else if self.is_wall_available(coord, cell_walls.south()) {
+    //         results.push(cell_walls.south());
+    //     } else if self.is_wall_available(coord, cell_walls.west()) {
+    //         results.push(cell_walls.west());
+    //     }
+    // }
     // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#generate-random-numbers-within-a-range
     pub fn get_rand_coord(&self) -> Coord {
         let mut rng = rand::thread_rng();
@@ -179,9 +179,10 @@ impl Grid {
 
     pub fn carve_random_wall_from_available(
         &mut self,
-        cell: &mut Cell,
+        // cell: &mut Cell,
         coord: &Coord,
     ) -> Option<Direction> {
+        let cell = self.cell_mut(coord).unwrap();
         let cell_walls = cell.walls();
 
         // find available walls
